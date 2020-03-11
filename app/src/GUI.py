@@ -276,7 +276,7 @@ class Gui:
         :return: Nothing
         """
         # Get the updated info
-        asyncio.get_event_loop().run_until_complete(self.__get_info())
+        # asyncio.get_event_loop().run_until_complete(self.__get_info())
 
         # Clear the current list of students in queue:
         for slave in self.names_frame.pack_slaves():

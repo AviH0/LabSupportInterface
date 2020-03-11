@@ -79,7 +79,8 @@ class SheetReader:
     @authenticate
     def get_current_rows(self):
         try:
-            return self.sheet.get_all_values()[4:]
+            result = self.sheet.get_all_values()[4:]
+            return filter(lambda x: x[0], result)
         except httplib2.ServerNotFoundError:
             print("Connection error, please check network connection.", file=sys.stderr)
             return None
