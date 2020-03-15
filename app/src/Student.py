@@ -2,8 +2,6 @@ import datetime
 import re
 import os
 
-
-
 OS = os.name
 
 is_linux = OS == 'linux' or OS == 'posix'
@@ -19,18 +17,26 @@ class Student:
             self.topic = stu.topic
             self.status = stu.status
             self.index = stu.index
+            self.mail = stu.mail
         else:
             self.timestamp = row[0]
-            self.name = self.fix_hebrew(str(row[1]).encode(encoding='cp424', errors='replace').decode(encoding='cp424',
-                                                                                      errors='replace'))
+            self.name = self.fix_hebrew(
+                str(row[1]).encode(encoding='cp424', errors='replace').decode(encoding='cp424',
+                                                                              errors='replace'))
             self.topic = str(row[2]).encode(encoding='cp424', errors='replace').decode(encoding='cp424',
                                                                                        errors='replace')
 
             self.time_made_orange = row[3]
             self.status = None
-            if len(row) > 4:
+            if len(row) > 4 and row[4]:
                 self.status = row[4]
             self.index = index
+            self.mail = ''
+            self.sent_mail = False
+            if len(row) > 5:
+                self.mail = row[5]
+            if len(row) > 6:
+                self.sent_mail = row[6] != ''
 
     def fix_hebrew(self, string: str):
         if not is_linux:

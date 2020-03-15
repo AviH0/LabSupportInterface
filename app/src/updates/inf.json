@@ -1,6 +1,6 @@
 {
   "product_name": "LabSupportClient",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "author": "Avinoam Hershler",
   "url": "https://github.com/AviH0/LabSupportInterface",
   "dependencies": ["gspread", "oauth2client", "requests", "zipfile"]

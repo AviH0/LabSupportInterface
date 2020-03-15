@@ -11,6 +11,8 @@ from app.src.tooltip import CreateToolTip
 
 from app.src import SheetReader
 from app.src.Student import Student
+from src.emailWriter import EmailWriter
+import app.src.config
 
 NO_CONNECTION = "-- No Connection --"
 
@@ -65,8 +67,17 @@ class Gui:
 
     def __init__(self):
 
+        # Create settings instance:
+        self.settings = app.src.config.Settings()
+
         # Create the sheet reader.
-        self.reader = SheetReader.SheetReader()
+        self.reader = SheetReader.SheetReader(self.settings)
+
+        # Create mail writer:
+        self.mailWriter = None
+        if app.src.config.MAIL_ACCOUNT_CREDS in self.settings.settings:
+            self.mailWriter = EmailWriter(self.settings)
+
         # Create the window:
         self.root = Tk()
         self.root.geometry(WINDOW_SIZE)
@@ -99,6 +110,13 @@ class Gui:
 
         view_menu.add_checkbutton(label="Always on top", command=toggle_always_ontop())
         menubar.add_cascade(label="View", menu=view_menu)
+
+        # Add options menu:
+        options = Menu(menubar, tearoff=0)
+        options.add_command(label="Settings",
+                            command=lambda: self.settings.change_settings(Toplevel(self.root)))
+        menubar.add_cascade(label="Options", menu=options)
+        self.root.config(menu=menubar)
 
         # Add about menu:
         about_menu = Menu(menubar, tearoff=0)
@@ -237,7 +255,6 @@ class Gui:
         self.loop.run_forever()
         # asyncio.run(self.get_info_loop())
 
-
     async def __get_info(self):
         """
         Update the list of students from the google spreadsheet. Called internally by draw.
@@ -296,7 +313,10 @@ class Gui:
                          justify=LEFT, width=500)
             name.bind("<Button-3>", lambda event: self.__right_click_menu(event))
             name.pack(anchor=W, fill=X, expand=True)
-            CreateToolTip(name, TIMESTAMP.format(stu.timestamp))
+            text = TIMESTAMP.format(stu.timestamp)
+            if stu.sent_mail:
+                text += ' (Mail Invite Sent)'
+            CreateToolTip(name, text)
 
         # Clear the current list of no-shows:
         for slave in self.no_shows_frame.pack_slaves():
@@ -317,7 +337,10 @@ class Gui:
                       lambda event: self.__load_no_show(event))
             name.bind("<Button-3>", lambda event: self.__right_click_menu(event))
             name.pack(anchor=W, fill=X, expand=True)
-            CreateToolTip(name, TIMESTAMP.format(stu.timestamp))
+            text = TIMESTAMP.format(stu.timestamp)
+            if stu.sent_mail:
+                text += ' (Mail Invite Sent)'
+            CreateToolTip(name, text)
 
         # Set the current information to display:
         name = ""
@@ -505,6 +528,7 @@ class Gui:
         # Parse this student's index (ugly but it works for now):
         name = event.widget.cget('text')
         index = self.get_index_from_name(name)
+        stu = self.__stu_from_index(index)
 
         # Create the menu options and bindings:
         menu = Menu(event.widget, tearoff=0)
@@ -514,10 +538,20 @@ class Gui:
                          command=lambda: self.__remove_stu(index))
         menu.add_command(label=CALL_MENU_OPT,
                          command=lambda: self.__call_stu(index))
+        if self.mailWriter and stu.mail:
+            menu.add_command(label='Send Invite', command=lambda: self.__send_invite(stu))
+
         # if event.widget.master is self.no_shows_frame:
         menu.add_command(label=LOAD_MENU_OPT,
                          command=lambda: self.__load_no_show(event))
         menu.tk_popup(event.x_root, event.y_root)
+
+    def __send_invite(self, stu):
+
+        if stu.sent_mail:
+            return
+        self.reader.mail_sent(stu.index)
+        self.mailWriter.send_message_with_link(stu.mail, self.settings.settings[app.src.config.SESSION_LINK])
 
     def __reset_stu(self, index):
         """
