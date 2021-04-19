@@ -1,4 +1,6 @@
 import sys
+import time
+
 import app.src.config
 
 
@@ -90,6 +92,7 @@ class SheetReader:
     @authenticate
     def stu_finished(self, index):
         self.sheet.update_cell(5 + index, 5, self.FINISHED)
+        self.sheet.update_cell(5 + index, 9, f"Turned Green at: {time.asctime()}")
 
     @authenticate
     def stu_no_showed(self, index, time):
@@ -108,6 +111,7 @@ class SheetReader:
     @authenticate
     def stu_arrived(self, index):
         self.sheet.update_cell(5 + index, 5, self.ARRIVED)
+        self.sheet.update_cell(5 + index, 8, f"Turned Yellow at: {time.asctime()}")
 
     @authenticate
     def remove_stu(self, index):
