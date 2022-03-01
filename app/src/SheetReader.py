@@ -1,8 +1,10 @@
 import sys
 import time
+from tkinter import Tk
+from tkinter.messagebox import showerror
 
 import app.src.config
-
+from src.GUI import show_error_and_exit
 
 try:
     import gspread
@@ -10,10 +12,10 @@ try:
     import httplib2
     import requests
 except ImportError:
-    print("Please ensure you have the packages: oauth2client, gspread installed before using.\n"
+    show_error_and_exit("Please ensure you have the packages: oauth2client, gspread installed before using.\n"
           "you can install them by pasting the following command into your shell:\n"
           "python -m pip install gspread oauth2client")
-    sys.exit(1)
+
 
 # Share spreadsheet with following email address: lab-support@lab-support-intro2cs.iam.gserviceaccount.com
 # Then paste the name of the spreadsheet in the following variable:
@@ -70,11 +72,9 @@ class SheetReader:
             # Make sure you use the right name here.
             self.sheet = self.client.open(self.NAME_OF_SPREADSHEET).get_worksheet(1)
         except FileNotFoundError:
-            print("Please ensure client secret json file is present in credentials directory")
-            sys.exit(1)
+            show_error_and_exit("Please ensure credential files are present in credentials directory")
         except gspread.exceptions.APIError:
-            print("Unexpected authorization error.")
-            sys.exit(1)
+            show_error_and_exit("Unexpected authorization error.")
         except httplib2.ServerNotFoundError:
             print("Connection error, please check network connection.", file=sys.stderr)
         except requests.exceptions.ConnectionError:
@@ -117,3 +117,4 @@ class SheetReader:
     def remove_stu(self, index):
         self.sheet.delete_row(5 + index)
         self.sheet.append_row([])
+
