@@ -1,8 +1,6 @@
-import asyncio
 import os
 import tkinter as tk
 
-from src.GUI import Gui
 
 TITLE = "Settings"
 
@@ -28,7 +26,7 @@ class Settings:
         self.new_settings = {key: None for key in self.settings.keys()}
         self.load_configurations()
 
-    def change_settings(self, gui: Gui = None,):
+    def change_settings(self, gui= None,):
         need_to_quit = False
         if not gui:
             need_to_quit = True
