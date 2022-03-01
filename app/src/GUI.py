@@ -6,6 +6,8 @@ from time import localtime
 from time import strftime
 from tkinter import *
 import tkinter.messagebox
+import tkinter.simpledialog
+import gspread.exceptions
 
 from app.src.tooltip import CreateToolTip
 
@@ -67,11 +69,13 @@ class Gui:
 
     def __init__(self):
 
+        self.loop = None
+
         # Create settings instance:
         self.settings = app.src.config.Settings()
 
-        # Create the sheet reader.
-        self.reader = SheetReader.SheetReader(self.settings)
+        # Create the sheet reader moved to start loop so that we can show a dialog if the sheet is not found.
+        self.reader = None# SheetReader.SheetReader(self.settings)
 
         # Create mail writer:
         self.mailWriter = None
@@ -239,7 +243,8 @@ class Gui:
         self.root.mainloop()  # Start the mainloop
 
     def close(self):
-        self.loop.stop()
+        if self.loop:
+            self.loop.stop()
         self.root.quit()
         sys.exit(0)
 
@@ -248,7 +253,31 @@ class Gui:
             await self.__get_info()
             await asyncio.sleep(5)
 
+    def __select_sheet(self):
+        # Create a new temporary "parent"
+        newWin = Tk()
+        # But make it invisible
+        newWin.withdraw()
+        name = tkinter.simpledialog.askstring("Enter SpreadSheet Name", "Could not find Spreadsheet, please enter a valid spreadsheet name", initialvalue=f"{self.settings.settings[app.src.config.SOURCE_SPREADSHEET]}", parent=newWin)
+        if not name:
+            tkinter.messagebox.showerror("Fatal Error!", "Could not find specified spreadsheet.\nExiting.", parent=newWin)
+            newWin.destroy()
+            self.close()
+        newWin.destroy()
+        self.settings.settings[app.src.config.SOURCE_SPREADSHEET] = name
+        self.settings.save_configurations()
+
+    def __connect_to_sheet(self):
+        connected = False
+        while not connected:
+            try:
+                self.reader = SheetReader.SheetReader(self.settings)
+                connected = True
+            except gspread.exceptions.SpreadsheetNotFound:
+                self.__select_sheet()
+
     def start_get_info_loop(self):
+        self.__connect_to_sheet()
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         self.loop.create_task(self.get_info_loop())
