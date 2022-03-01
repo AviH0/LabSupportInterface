@@ -271,7 +271,7 @@ class Gui:
         connected = False
         while not connected:
             try:
-                self.reader = SheetReader.SheetReader(self.settings)
+                self.reader = SheetReader.SheetReader(self.settings, lambda: self.close())
                 connected = True
             except gspread.exceptions.SpreadsheetNotFound:
                 self.__select_sheet()

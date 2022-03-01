@@ -43,12 +43,14 @@ class SheetReader:
     ARRIVED = '1'
     DEFAULT = ''
 
-    def __init__(self, settings):
+    def __init__(self, settings, close_callback=None):
 
         self.CREDENTIALS_DIRECTORY = settings.settings[
             app.src.config.PATH_TO_CREDENETIALS]  # 'app/credentials/Lab Support Intro2CS-273f7439f27c.json'
         self.NAME_OF_SPREADSHEET = settings.settings[
             app.src.config.SOURCE_SPREADSHEET]  # "Intro2CS - Lab Support Queue - Edit"
+
+        self.on_close = close_callback
 
         # use creds to create a client to interact with the Google Drive API
         self.scope = ['https://www.googleapis.com/auth/drive']
@@ -56,6 +58,7 @@ class SheetReader:
         self.client = None
         self.creds = None
         self.reinitialize()
+
 
     def reauth(self):
         if self.client and self.sheet:
@@ -72,9 +75,9 @@ class SheetReader:
             # Make sure you use the right name here.
             self.sheet = self.client.open(self.NAME_OF_SPREADSHEET).get_worksheet(1)
         except FileNotFoundError:
-            show_error_and_exit("Please ensure credential files are present in credentials directory")
+            show_error_and_exit("Please ensure credential files are present in credentials directory", before_exit=self.on_close)
         except gspread.exceptions.APIError:
-            show_error_and_exit("Unexpected authorization error.")
+            show_error_and_exit("Unexpected authorization error.", before_exit=self.on_close)
         except httplib2.ServerNotFoundError:
             print("Connection error, please check network connection.", file=sys.stderr)
         except requests.exceptions.ConnectionError:
