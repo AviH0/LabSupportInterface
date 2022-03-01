@@ -4,7 +4,7 @@ from tkinter import Tk
 from tkinter.messagebox import showerror
 
 import app.src.config
-from src.GUI import show_error_and_exit
+from app.src.GUI import show_error_and_exit
 
 try:
     import gspread
