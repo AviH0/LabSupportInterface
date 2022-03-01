@@ -114,7 +114,7 @@ class Gui:
         # Add options menu:
         options = Menu(menubar, tearoff=0)
         options.add_command(label="Settings",
-                            command=lambda: self.settings.change_settings(Toplevel(self.root)))
+                            command=lambda: self.settings.change_settings(self))
         menubar.add_cascade(label="Options", menu=options)
         self.root.config(menu=menubar)
 

@@ -1,5 +1,8 @@
+import asyncio
 import os
 import tkinter as tk
+
+from src.GUI import Gui
 
 TITLE = "Settings"
 
@@ -25,11 +28,13 @@ class Settings:
         self.new_settings = {key: None for key in self.settings.keys()}
         self.load_configurations()
 
-    def change_settings(self, root=None):
+    def change_settings(self, gui: Gui = None,):
         need_to_quit = False
-        if not root:
+        if not gui:
             need_to_quit = True
             root = tk.Tk()
+        else:
+            root = tk.Toplevel(gui.root)
         root.title(TITLE)
         settings_frame = tk.Frame(root)
         index = 0
@@ -41,6 +46,9 @@ class Settings:
             value.config(width=100)
             value.grid(row=index, column=1, sticky=tk.E)
             self.new_settings[key] = value
+
+        auth_mail_button = tk.Button(settings_frame, text="Authorize Gmail Account", command=lambda: gui.mailWriter.authorize_new_account())
+        auth_mail_button.grid(row=index + 1, column=0, padx=5, sticky=tk.W, pady=10)
         settings_frame.pack(padx=20)
 
         def apply(save=True):
