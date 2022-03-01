@@ -21,7 +21,11 @@ class Settings:
     def __init__(self):
         self.settings = {PATH_TO_CREDENETIALS: os.path.join(os.path.curdir, 'app', 'credentials',
                                                             'Lab Support Intro2CS-273f7439f27c.json'),
-                         SOURCE_SPREADSHEET: 'Sheet', SESSION_LINK: ''}
+                         SOURCE_SPREADSHEET: 'Sheet',
+                         SESSION_LINK: '',
+                         INVITE_MSG_BODY: os.path.join(os.path.curdir, 'app', 'config',"email_message.txt"),
+                         MAIL_ACCOUNT_CREDS: os.path.join(os.path.curdir, 'app', 'credentials',"mail_account_secret.json"),
+                         PATH_TO_CLIENT_SECRET: os.path.join(os.path.curdir, 'app', 'credentials',"client_secret_637398666132-j8s19q7egap0u79l894jmuhauiv39ec7.apps.googleusercontent.com.json")}
 
         self.new_settings = {key: None for key in self.settings.keys()}
         self.load_configurations()

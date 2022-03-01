@@ -1,0 +1,10 @@
+Hello,
+
+This is an automated message from HUJI CS C/C++ Workshop Lab Support notifying you that your turn has arrived.
+
+Please proceed to the Lab Support station in CS Lab A100.
+
+--------------------------------------
+
+If you need to attend on Zoom, use the following link:
+
