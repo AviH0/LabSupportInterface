@@ -18,7 +18,7 @@ UPDATER_SRCS=../app/src/updates/updater.py ../Update.py
 
 TARGETS= $(CLIENT) $(CLIENT_WITH_CONSOLE) $(UPDATER) $(JSON) $(ZIP)
 
-PYTHON_EXECUTABLE=../venv/Scripts/python3
+PYTHON_EXECUTABLE=../venv/bin/python3
 PYTHON_FLAGS=-OO -m
 PYINS_FLAGS=--clean --exclude matplotlib --exclude scipy --exclude pandas --hidden-import='pkg_resources.py2_warn'
 
