@@ -1,20 +1,23 @@
 import shutil
+import subprocess
+import sys
+
 import requests
 import zipfile
 import os
 import json
 
+from tqdm import tqdm
+from app.src.platform import *
 
-DEFAULT_URL = "https://github.com/AviH0/LabSupportInterface/archive/master.zip"
 UPDATE_FILE = 'update.zip'
 
 TEMP_DIR = ".update_data"
-ARCHIVE_ROOT_NAME = "LabSupportInterface-master"
+ARCHIVE_ROOT_NAME = ""
 INF_JSON_URL = "https://raw.githubusercontent.com/AviH0/LabSupportInterface/master/app/src/updates/inf.json"
 
 
 def do_update():
-    print("checking for updates...")
     if __is_update_needed():
         print("Updating LabSupportClient...\n")
         __download_update()
@@ -22,13 +25,21 @@ def do_update():
         __copy_update()
         __clean_up()
         print("Update successful.")
+        subprocess.Popen(MAIN_EXE_NAME)
+        sys.exit(0)
         return True
     else:
-        print("Installed version is up-to-date.")
         return False
 
 
+def check_for_updates():
+
+    if __is_update_needed():
+        return True
+
+
 def __is_update_needed():
+    print("checking for updates...")
     try:
         with open("app/src/updates/inf.json") as inf:
             product_info = json.load(inf)
@@ -36,14 +47,20 @@ def __is_update_needed():
             newest_info = r.json()
             installed_version = product_info["version"].split('.')
             newest_version = newest_info["version"].split('.')
-            return __compare_versions(installed_version, newest_version)
+            if __compare_versions(installed_version, newest_version):
+                print("newer version found.")
+                return True
     except json.JSONDecodeError:
+        print("Problem identifying current version")
         return True
     except FileNotFoundError:
+        print("Problem identifying current version")
         return True
     except requests.ConnectionError:
         print("Could not connect to update server.")
         return False
+    print("Installed version is up-to-date.")
+    return False
 
 
 def __compare_versions(installed_version, newest_version):
@@ -58,10 +75,18 @@ def __compare_versions(installed_version, newest_version):
 
 def __download_update():
     print("Fetching update... ", end='')
-    r = requests.get(DEFAULT_URL, stream=True)
-    with open(UPDATE_FILE, 'wb') as f:
-        for chunk in r.iter_content():
-            f.write(chunk)
+    with requests.get(DEFAULT_URL, stream=True) as r:
+        with open(UPDATE_FILE, 'wb') as f:
+            t = tqdm(total=int(r.headers['Content-Length']), desc=f"Downloading {UPDATE_FILE}...",
+                          unit='B', unit_scale=True, unit_divisor=1024, miniters=1)
+            for chunk in r.iter_content(chunk_size=1024 * 100):
+                f.write(chunk)
+                t.update(len(chunk))
+            t.close()
+        # with open(UPDATE_FILE, 'wb') as f:
+        #     # for chunk in r.iter_content(chunk_size=1024*10):
+        #     #     f.write(chunk)
+        #     shutil.copyfileobj(r.raw, f, length=1024*1024)
     print("done.")
 
 
@@ -103,5 +128,3 @@ def __recursive_overwrite(src, dest, ignore=None):
                                       ignore)
     else:
         shutil.copyfile(src, dest)
-
-

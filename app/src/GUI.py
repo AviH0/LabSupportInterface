@@ -6,12 +6,14 @@ from time import localtime
 from time import strftime
 from tkinter import *
 import tkinter.messagebox
+import tkinter.simpledialog
+import gspread.exceptions
 
 from app.src.tooltip import CreateToolTip
 
 from app.src import SheetReader
 from app.src.Student import Student
-from src.emailWriter import EmailWriter
+from app.src.emailWriter import EmailWriter
 import app.src.config
 
 NO_CONNECTION = "-- No Connection --"
@@ -67,11 +69,13 @@ class Gui:
 
     def __init__(self):
 
+        self.loop = None
+
         # Create settings instance:
         self.settings = app.src.config.Settings()
 
-        # Create the sheet reader.
-        self.reader = SheetReader.SheetReader(self.settings)
+        # Create the sheet reader moved to start loop so that we can show a dialog if the sheet is not found.
+        self.reader = None# SheetReader.SheetReader(self.settings)
 
         # Create mail writer:
         self.mailWriter = None
@@ -114,7 +118,7 @@ class Gui:
         # Add options menu:
         options = Menu(menubar, tearoff=0)
         options.add_command(label="Settings",
-                            command=lambda: self.settings.change_settings(Toplevel(self.root)))
+                            command=lambda: self.settings.change_settings(self))
         menubar.add_cascade(label="Options", menu=options)
         self.root.config(menu=menubar)
 
@@ -129,7 +133,7 @@ class Gui:
 
         # Create some data holders:
         self.current_student = None
-        self.current_list = []
+        self.current_list = ['INIT']
         self.no_shows_list = []
 
         self.connection_status = StringVar()
@@ -226,7 +230,7 @@ class Gui:
         self.gui_queue = queue.Queue()
 
         def draw_loop():
-            self.root.after(500, draw_loop)
+            self.root.after(100, draw_loop)
             try:
                 self.gui_queue.get_nowait()()
             except queue.Empty:
@@ -239,7 +243,8 @@ class Gui:
         self.root.mainloop()  # Start the mainloop
 
     def close(self):
-        self.loop.stop()
+        if self.loop:
+            self.loop.stop()
         self.root.quit()
         sys.exit(0)
 
@@ -248,7 +253,31 @@ class Gui:
             await self.__get_info()
             await asyncio.sleep(5)
 
+    def __select_sheet(self):
+        # Create a new temporary "parent"
+        newWin = Tk()
+        # But make it invisible
+        newWin.withdraw()
+        name = tkinter.simpledialog.askstring("Enter SpreadSheet Name", "Could not find Spreadsheet, please enter a valid spreadsheet name", initialvalue=f"{self.settings.settings[app.src.config.SOURCE_SPREADSHEET]}", parent=newWin)
+        if not name:
+            tkinter.messagebox.showerror("Fatal Error!", "Could not find specified spreadsheet.\nExiting.", parent=newWin)
+            newWin.destroy()
+            self.close()
+        newWin.destroy()
+        self.settings.settings[app.src.config.SOURCE_SPREADSHEET] = name
+        self.settings.save_configurations()
+
+    def __connect_to_sheet(self):
+        connected = False
+        while not connected:
+            try:
+                self.reader = SheetReader.SheetReader(self.settings, lambda: self.close())
+                connected = True
+            except gspread.exceptions.SpreadsheetNotFound:
+                self.__select_sheet()
+
     def start_get_info_loop(self):
+        self.__connect_to_sheet()
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         self.loop.create_task(self.get_info_loop())
@@ -280,10 +309,14 @@ class Gui:
 
         need_to_redraw = rows != self.current_data
 
+        # If there were no students waiting and now there are, notify.
+        if not self.current_student and len(list(filter(lambda x: (x.status != '1' and x.status != '3'), new_list))) >= 1 and len(list(filter(lambda x: (x.status != '1' and x.status != '3') if x != 'INIT' else True, self.current_list))) == 0:
+            self.notify()
+
         self.current_list = new_list
         self.no_shows_list = no_show_list
         self.current_data = rows
-        if need_to_redraw:
+        if need_to_redraw and self.gui_queue.empty():
             self.gui_queue.put(self.draw)
         return need_to_redraw
 
@@ -293,7 +326,7 @@ class Gui:
         :return: Nothing
         """
         # Get the updated info
-        # asyncio.get_event_loop().run_until_complete(self.__get_info())
+        # self.__get_info()
 
         # Clear the current list of students in queue:
         for slave in self.names_frame.pack_slaves():
@@ -315,7 +348,7 @@ class Gui:
             name.pack(anchor=W, fill=X, expand=True)
             text = TIMESTAMP.format(stu.timestamp)
             if stu.sent_mail:
-                text += '(Mail Invite Sent)'
+                text += ' (Mail Invite Sent)'
             CreateToolTip(name, text)
 
         # Clear the current list of no-shows:
@@ -375,7 +408,7 @@ class Gui:
         if not self.current_student:
             return
         self.current_status = HELPING
-        self.draw()
+        self.root.after(1, self.draw)
 
     def __next_student(self, finished=True):
         """
@@ -391,7 +424,7 @@ class Gui:
         # If there are no students left in the queue, handle that and return.
         if len(self.current_list) == 0:
             self.current_student = None
-            self.draw()
+            self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
             return
 
         # self.__get_info()  # Better to update so we are sure we are seeing the correct info.
@@ -410,7 +443,7 @@ class Gui:
         else:
             # No students found on the list (all are yellow or green)
             self.current_student = None
-            self.draw()
+            self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
             return
 
         # A student was selected, change his status to yellow.
@@ -418,7 +451,7 @@ class Gui:
 
         # Status is now Waiting
         self.current_status = WAITING
-        self.draw()
+        self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
 
     def __student_no_show(self):
         """
@@ -434,7 +467,7 @@ class Gui:
         self.reader.stu_no_showed(self.current_student.index, hour)
 
         self.no_show_button.configure(state=DISABLED)
-        self.__next_student(False)
+        self.root.after(1, lambda: self.__next_student(False))
 
     def __load_student(self, index):
         """
@@ -456,7 +489,7 @@ class Gui:
         self.current_student = stu
         self.reader.stu_arrived(stu.index)
         self.current_status = HELPING
-        self.draw()
+        self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
 
     def __call_stu(self, index):
         """
@@ -478,7 +511,8 @@ class Gui:
         self.current_student = stu
         self.reader.stu_arrived(stu.index)
         self.current_status = WAITING
-        self.draw()
+
+        self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
 
     def __stu_from_index(self, index):
         """
@@ -568,7 +602,7 @@ class Gui:
             self.current_student = None
             # self.__next_student(False)
         else:
-            self.draw()
+            self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
 
     def __remove_stu(self, index):
         """
@@ -587,7 +621,7 @@ class Gui:
                     break
             else:
                 self.current_student = None
-        self.draw()
+        self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
 
     @staticmethod
     def __display_product_info():
@@ -615,3 +649,7 @@ class Gui:
 
     def show_network_error(self):
         self.connection_status.set(NO_CONNECTION)
+
+    def notify(self):
+        tkinter.messagebox.showinfo("New Student!", "A Student has registered to the queue.")
+

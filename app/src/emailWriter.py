@@ -1,5 +1,7 @@
+import asyncio
 import base64
 import os
+import threading
 from email.mime.text import MIMEText
 from oauth2client.client import AccessTokenCredentials
 from googleapiclient.discovery import build
@@ -55,15 +57,15 @@ class EmailWriter:
         message = self.create_message("labsupportcs", address, 'LAB SUPPORT', message_text)
         self.send_message(message)
 
-    def authorize_new_account(self):
+    def authorize_new_account(self, force=True):
         store = Storage(os.path.join(self.settings.settings[app.src.config.MAIL_ACCOUNT_CREDS]))
         credentials = store.get()
-        if not credentials or credentials.invalid:
+        if not credentials or credentials.invalid or force:
             flow = client.flow_from_clientsecrets(
                 self.CLIENT_SCERET_PATH,
                 SCOPES)
             flow.user_agent = USER_AGENT
-            credentials = tools.run_flow(flow, store)
+            threading.Thread(target=lambda: tools.run_flow(flow, store)).start()
 
 
 if __name__ == '__main__':

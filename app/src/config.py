@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 
+
 TITLE = "Settings"
 
 CONFIG_DIRECTORY = os.path.join(os.path.curdir, 'app', 'config')
@@ -20,16 +21,22 @@ class Settings:
     def __init__(self):
         self.settings = {PATH_TO_CREDENETIALS: os.path.join(os.path.curdir, 'app', 'credentials',
                                                             'Lab Support Intro2CS-273f7439f27c.json'),
-                         SOURCE_SPREADSHEET: 'Sheet', SESSION_LINK: ''}
+                         SOURCE_SPREADSHEET: 'Sheet',
+                         SESSION_LINK: '',
+                         INVITE_MSG_BODY: os.path.join(os.path.curdir, 'app', 'config',"email_message.txt"),
+                         MAIL_ACCOUNT_CREDS: os.path.join(os.path.curdir, 'app', 'credentials',"mail_account_secret.json"),
+                         PATH_TO_CLIENT_SECRET: os.path.join(os.path.curdir, 'app', 'credentials',"client_secret_637398666132-j8s19q7egap0u79l894jmuhauiv39ec7.apps.googleusercontent.com.json")}
 
         self.new_settings = {key: None for key in self.settings.keys()}
         self.load_configurations()
 
-    def change_settings(self, root=None):
+    def change_settings(self, gui= None,):
         need_to_quit = False
-        if not root:
+        if not gui:
             need_to_quit = True
             root = tk.Tk()
+        else:
+            root = tk.Toplevel(gui.root)
         root.title(TITLE)
         settings_frame = tk.Frame(root)
         index = 0
@@ -41,6 +48,9 @@ class Settings:
             value.config(width=100)
             value.grid(row=index, column=1, sticky=tk.E)
             self.new_settings[key] = value
+
+        auth_mail_button = tk.Button(settings_frame, text="Authorize Gmail Account", command=lambda: gui.mailWriter.authorize_new_account())
+        auth_mail_button.grid(row=index + 1, column=0, padx=5, sticky=tk.W, pady=10)
         settings_frame.pack(padx=20)
 
         def apply(save=True):
