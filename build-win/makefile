@@ -52,19 +52,19 @@ $(UPDATER): $(UPDATER_SRCS) $(PUBLISH_DIR)
 
 
 $(PUBLISH_DIR):
-	md -Force $(PUBLISH_DIR)
+	[ -d "$(PUBLISH_DIR)" ] || mkdir $(PUBLISH_DIR)
 
 $(PUBLISH_DIR)/$(APP_DIR): $(PUBLISH_DIR)
-	md -Force $(PUBLISH_DIR)/$(APP_DIR)
+	[ -d "$(PUBLISH_DIR)/$(APP_DIR)" ] || mkdir $(PUBLISH_DIR)/$(APP_DIR)
 
 $(PUBLISH_DIR)/$(SRC_DIR): $(PUBLISH_DIR)/$(APP_DIR)
-	md -Force $(PUBLISH_DIR)/$(SRC_DIR)
+	[ -d "$(PUBLISH_DIR)/$(SRC_DIR)" ] || mkdir $(PUBLISH_DIR)/$(SRC_DIR)
 
 $(PUBLISH_DIR)/$(CONFIG_DIR): $(PUBLISH_DIR)/$(APP_DIR)
-	md -Force $(PUBLISH_DIR)/$(CONFIG_DIR)
+	[ -d "$(PUBLISH_DIR)/$(CONFIG_DIR)" ] || mkdir $(PUBLISH_DIR)/$(CONFIG_DIR)
 
 $(PUBLISH_DIR)/$(INF_DIR): $(PUBLISH_DIR)/$(SRC_DIR)
-	md -Force $(PUBLISH_DIR)/$(INF_DIR)
+	[ -d "$(PUBLISH_DIR)/$(INF_DIR)" ] || mkdir $(PUBLISH_DIR)/$(INF_DIR)
 
 $(JSON): $(JSON_SRC) $(PUBLISH_DIR)\$(INF_DIR)\
 	cp $(JSON_SRC) $(PUBLISH_DIR)\$(INF_DIR)
