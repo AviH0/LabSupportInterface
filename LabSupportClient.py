@@ -1,3 +1,4 @@
+import subprocess
 import sys
 import os
 from tkinter import Tk
@@ -44,7 +45,8 @@ if __name__ == '__main__':
         updates_disabled = sys.argv[1] == "--no-updates"
     if not updates_disabled and updater.check_for_updates():
         fetch_updater()
-        os.execv(UPDATER_FILE, ['a'])
+        subprocess.Popen(UPDATER_FILE)
+        sys.exit(0)
     from app.src import GUI
     gui = GUI.Gui()
 

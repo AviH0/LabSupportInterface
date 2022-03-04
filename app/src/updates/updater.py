@@ -1,4 +1,7 @@
 import shutil
+import subprocess
+import sys
+
 import requests
 import zipfile
 import os
@@ -22,7 +25,8 @@ def do_update():
         __copy_update()
         __clean_up()
         print("Update successful.")
-        os.execv(MAIN_EXE_NAME, ['a'])
+        subprocess.Popen(MAIN_EXE_NAME)
+        sys.exit(0)
         return True
     else:
         return False
