@@ -22,8 +22,8 @@ PYTHON_EXECUTABLE=..\venv\Scripts\python.exe
 PYTHON_FLAGS=-OO -m
 PYINS_FLAGS=--clean --exclude matplotlib --exclude scipy --exclude pandas --hidden-import='pkg_resources.py2_warn'
 
-$(ZIP): $(CLIENT) $(CLIENT_WITH_CONSOLE) $(JSON)
-	cd publish && 7z.exe a -tzip LS_WINDOWS.zip app $(CLIENT_EXE) $(CLIENT_CON_EXE)
+$(ZIP): $(CLIENT) $(CLIENT_WITH_CONSOLE) $(JSON) $(PUBLISH_DIR)
+	cd $(PUBLISH_DIR) && 7z.exe a -tzip LS_WINDOWS.zip app $(CLIENT_EXE) $(CLIENT_CON_EXE)
 
 .PHONY:
 all: $(TARGETS)
@@ -40,17 +40,23 @@ client_console: $(CLIENT_WITH_CONSOLE)
 .PHONY:
 updater: $(UPDATER)
 
-$(CLIENT): $(CLIENT_SRCS)
+$(CLIENT): $(CLIENT_SRCS) $(PUBLISH_DIR)
 	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -Fw ../LabSupportClient.py --distpath $(PUBLISH_DIR) $(PYINS_FLAGS)
 
-$(CLIENT_WITH_CONSOLE): $(CLIENT_SRCS)
+$(CLIENT_WITH_CONSOLE): $(CLIENT_SRCS) $(PUBLISH_DIR)
 	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -F ../LabSupportClient.py --distpath=$(PUBLISH_DIR) $(PYINS_FLAGS) --name LSCWithConsole.exe
 
-$(UPDATER): $(UPDATER_SRCS)
+$(UPDATER): $(UPDATER_SRCS) $(PUBLISH_DIR)
 	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -F --distpath $(PUBLISH_DIR) $(PYINS_FLAGS) ../Update.py
 
-$(JSON): $(JSON_SRC)
-	cp $(JSON_SRC) $(PUBLISH_DIR)\$(INF_DIR)\
+$(PUBLISH_DIR):
+	[ -d "$(PUBLISH_DIR)" ] || mkdir $(PUBLISH_DIR)
+
+$(PUBLISH_DIR)\$(INF_DIR):
+	[ -d "$(PUBLISH_DIR)\$(INF_DIR)" ] || mkdir $(PUBLISH_DIR)\$(INF_DIR)
+
+$(JSON): $(JSON_SRC) $(PUBLISH_DIR)\$(INF_DIR)\
+	cp $(JSON_SRC) $(PUBLISH_DIR)\$(INF_DIR)
 
 
 $(PYTHON_EXECUTABLE):
