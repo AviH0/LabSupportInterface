@@ -23,7 +23,7 @@ jobs:
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
-        artifacts: publish-linux/LS_LINUX.zip, publish-linux/updater_Linux
+        artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
         name: Latest executables
   
   deploy-win:
