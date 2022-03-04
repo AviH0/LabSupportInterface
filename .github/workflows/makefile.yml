@@ -1,0 +1,45 @@
+name: Makefile CI
+
+on:
+  deployment
+
+jobs:
+  deploy-linux:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Install dependencies
+      run: make -m=build-linux venv_
+      
+    - name: Run build
+      run: make -m=build-linux all
+      
+    - name: Upload new Release
+      uses: ncipollo/release-action@v1.9.0
+      with:
+        allowUpdates: true
+        artifact: publish-linux/LS_LINUX.zip, publish-linux/updater_Linux
+        name: Latest executables
+  
+  deploy-win:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Install dependencies
+      run: make -m=build-win venv_
+      
+    - name: Run build
+      run: make -m=build-win all
+      
+    - name: Upload new Release
+      uses: ncipollo/release-action@v1.9.0
+      with:
+        allowUpdates: true
+        artifact: publish-win/LS_WINDOWS.zip, publish-win/updater_Windows.exe
+        name: Latest executables
