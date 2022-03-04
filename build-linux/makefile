@@ -26,7 +26,7 @@ PYTHON_FLAGS=-OO -m
 PYINS_FLAGS=--clean --exclude matplotlib --exclude scipy --exclude pandas --hidden-import='pkg_resources.py2_warn'
 
 $(ZIP): $(CLIENT) $(CLIENT_WITH_CONSOLE) $(JSON) $(PUBLISH_DIR)
-	cd $(PUBLISH_DIR) && zip LS_LINUX.zip app $(CLIENT_EXE) $(CLIENT_CON_EXE)
+	cd $(PUBLISH_DIR) && zip -r LS_LINUX.zip app $(CLIENT_EXE) $(CLIENT_CON_EXE)
 
 .PHONY:
 all: $(TARGETS)
