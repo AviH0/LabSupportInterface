@@ -56,7 +56,7 @@ $(JSON): $(JSON_SRC) $(PUBLISH_DIR)\$(INF_DIR)\
 
 
 $(PYTHON_EXECUTABLE):
-	python -m venv venv
+	python -m venv ..\venv
 
 .PHONY:
 venv_: $(PYTHON_EXECUTABLE)
