@@ -3,7 +3,9 @@ PUBLISH_DIR=../publish-linux
 CLIENT_EXE=LabSupportClient
 CLIENT_CON_EXE=LSCWithConsole
 UPDATER_EXE=Update
-INF_DIR=app/src/updates
+APP_DIR=app
+SRC_DIR=$(APP_DIR)/src
+INF_DIR=$(SRC_DIR)/updates
 INF_FILENAME=inf.json
 
 CLIENT=$(PUBLISH_DIR)/$(CLIENT_EXE)
@@ -55,7 +57,13 @@ $(JSON): $(JSON_SRC) $(PUBLISH_DIR)/$(INF_DIR)
 $(PUBLISH_DIR):
 	[ -d "$(PUBLISH_DIR)" ] || mkdir $(PUBLISH_DIR)
 
-$(PUBLISH_DIR)\$(INF_DIR): $(PUBLISH_DIR)
+$(PUBLISH_DIR)\$(APP_DIR): $(PUBLISH_DIR)
+	[ -d "$(PUBLISH_DIR)\$(APP_DIR)" ] || mkdir $(PUBLISH_DIR)\$(APP_DIR)
+
+$(PUBLISH_DIR)\$(SRC_DIR): $(PUBLISH_DIR)\$(APP_DIR)
+	[ -d "$(PUBLISH_DIR)\$(SRC_DIR)" ] || mkdir $(PUBLISH_DIR)\$(SRC_DIR)
+
+$(PUBLISH_DIR)\$(INF_DIR): $(PUBLISH_DIR)\$(SRC_DIR)
 	[ -d "$(PUBLISH_DIR)\$(INF_DIR)" ] || mkdir $(PUBLISH_DIR)\$(INF_DIR)
 
 $(PYTHON_EXECUTABLE):
