@@ -1,3 +1,4 @@
+import subprocess
 import sys
 import os
 from tkinter import Tk
@@ -6,18 +7,16 @@ import requests
 from tqdm.tk import tqdm_tk as tqdm
 
 from app.src.updates import updater
+from app.src.platform import *
 
-UPDATER_URL = 'https://github.com/AviH0/LabSupportInterface/releases/download/Latest/Updater_Windows.exe'
-
-UPDATER_FILE = 'Update.exe'
 
 
 
 
 def fetch_updater():
-    abort = False
+    abort = [False]
     def cancel():
-        abort = True
+        abort[0] = True
         print("Aborted.")
     newWin = Tk()
     newWin.withdraw()
@@ -29,14 +28,14 @@ def fetch_updater():
         for chunk in r.iter_content(chunk_size=1024*100):
             f.write(chunk)
             t.update(len(chunk))
-            if abort:
+            if abort[0]:
                 break
 
         t.close()
     r.close()
 
     newWin.destroy()
-    if abort:
+    if abort[0]:
         exit(0)
     print("done.")
 
@@ -46,7 +45,8 @@ if __name__ == '__main__':
         updates_disabled = sys.argv[1] == "--no-updates"
     if not updates_disabled and updater.check_for_updates():
         fetch_updater()
-        os.execv(UPDATER_FILE, ['a'])
+        subprocess.Popen(UPDATER_FILE)
+        sys.exit(0)
     from app.src import GUI
     gui = GUI.Gui()
 

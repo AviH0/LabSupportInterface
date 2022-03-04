@@ -1,12 +1,15 @@
 import shutil
+import subprocess
+import sys
+
 import requests
 import zipfile
 import os
 import json
 
 from tqdm import tqdm
+from app.src.platform import *
 
-DEFAULT_URL = "https://github.com/AviH0/LabSupportInterface/releases/download/Latest/LS_Windows.zip"
 UPDATE_FILE = 'update.zip'
 
 TEMP_DIR = ".update_data"
@@ -22,7 +25,8 @@ def do_update():
         __copy_update()
         __clean_up()
         print("Update successful.")
-        os.execv("LabSupportClient.exe", ['a'])
+        subprocess.Popen(MAIN_EXE_NAME)
+        sys.exit(0)
         return True
     else:
         return False
