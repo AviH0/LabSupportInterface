@@ -3,7 +3,10 @@ PUBLISH_DIR=../publish-win
 CLIENT_EXE=LabSupportClient.exe
 CLIENT_CON_EXE=LSCWithConsole.exe
 UPDATER_EXE=Updater_Windows.exe
-INF_DIR=app/src/updates
+APP_DIR=app
+SRC_DIR=$(APP_DIR)/src
+CONFIG_DIR=$(APP_DIR)/config
+INF_DIR=$(SRC_DIR)/updates
 INF_FILENAME=inf.json
 
 CLIENT=$(PUBLISH_DIR)/$(CLIENT_EXE)
