@@ -49,11 +49,11 @@ jobs:
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
-        artifacts: publish-win/LS_WINDOWS.zip, publish-win/updater_Windows.exe
+        artifacts: publish-win/LS_WINDOWS.zip, publish-win/Updater_Windows.exe
         name: Latest executables
         tag: Latest
         
     - name: New Release
       uses: ncipollo/release-action@v1.9.0
       with:
-        artifacts: publish-win/LS_WINDOWS.zip, publish-win/updater_Windows.exe
+        artifacts: publish-win/LS_WINDOWS.zip, publish-win/Updater_Windows.exe
