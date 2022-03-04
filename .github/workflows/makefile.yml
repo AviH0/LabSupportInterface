@@ -19,12 +19,18 @@ jobs:
     - name: Run build
       run: make -C build-linux all
       
-    - name: Upload new Release
+    - name: Update Releases
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
         artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
         name: Latest executables
+        tag: Latest
+    
+    - name: New Release
+      uses: ncipollo/release-action@v1.9.0
+      with:
+        artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
   
   deploy-win:
 
@@ -39,9 +45,15 @@ jobs:
     - name: Run build
       run: make -C build-win all
       
-    - name: Upload new Release
+    - name: Update Releases
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
         artifacts: publish-win/LS_WINDOWS.zip, publish-win/updater_Windows.exe
         name: Latest executables
+        tag: Latest
+        
+    - name: New Release
+      uses: ncipollo/release-action@v1.9.0
+      with:
+        artifacts: publish-win/LS_WINDOWS.zip, publish-win/updater_Windows.exe
