@@ -57,14 +57,14 @@ $(JSON): $(JSON_SRC) $(PUBLISH_DIR)/$(INF_DIR)
 $(PUBLISH_DIR):
 	[ -d "$(PUBLISH_DIR)" ] || mkdir $(PUBLISH_DIR)
 
-$(PUBLISH_DIR)\$(APP_DIR): $(PUBLISH_DIR)
-	[ -d "$(PUBLISH_DIR)\$(APP_DIR)" ] || mkdir $(PUBLISH_DIR)\$(APP_DIR)
+$(PUBLISH_DIR)/$(APP_DIR): $(PUBLISH_DIR)
+	[ -d "$(PUBLISH_DIR)/$(APP_DIR)" ] || mkdir $(PUBLISH_DIR)/$(APP_DIR)
 
-$(PUBLISH_DIR)\$(SRC_DIR): $(PUBLISH_DIR)\$(APP_DIR)
-	[ -d "$(PUBLISH_DIR)\$(SRC_DIR)" ] || mkdir $(PUBLISH_DIR)\$(SRC_DIR)
+$(PUBLISH_DIR)/$(SRC_DIR): $(PUBLISH_DIR)/$(APP_DIR)
+	[ -d "$(PUBLISH_DIR)/$(SRC_DIR)" ] || mkdir $(PUBLISH_DIR)/$(SRC_DIR)
 
-$(PUBLISH_DIR)\$(INF_DIR): $(PUBLISH_DIR)\$(SRC_DIR)
-	[ -d "$(PUBLISH_DIR)\$(INF_DIR)" ] || mkdir $(PUBLISH_DIR)\$(INF_DIR)
+$(PUBLISH_DIR)/$(INF_DIR): $(PUBLISH_DIR)/$(SRC_DIR)
+	[ -d "$(PUBLISH_DIR)/$(INF_DIR)" ] || mkdir $(PUBLISH_DIR)/$(INF_DIR)
 
 $(PYTHON_EXECUTABLE):
 	python3 -m venv ../venv
