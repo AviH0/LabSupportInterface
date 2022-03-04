@@ -2,7 +2,7 @@ PUBLISH_DIR=../publish-linux
 
 CLIENT_EXE=LabSupportClient
 CLIENT_CON_EXE=LSCWithConsole
-UPDATER_EXE=Update
+UPDATER_EXE=Updater_Linux
 APP_DIR=app
 SRC_DIR=$(APP_DIR)/src
 CONFIG_DIR=$(APP_DIR)/config

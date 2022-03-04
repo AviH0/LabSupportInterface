@@ -2,7 +2,7 @@ PUBLISH_DIR=../publish-win
 
 CLIENT_EXE=LabSupportClient.exe
 CLIENT_CON_EXE=LSCWithConsole.exe
-UPDATER_EXE=Update.exe
+UPDATER_EXE=Updater_Windows.exe
 INF_DIR=app\src\updates
 INF_FILENAME=inf.json
 
