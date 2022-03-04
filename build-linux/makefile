@@ -44,13 +44,13 @@ client_console: $(CLIENT_WITH_CONSOLE)
 updater: $(UPDATER)
 
 $(CLIENT): $(CLIENT_SRCS)
-	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -Fw ../LabSupportClient.py --distpath $(PUBLISH_DIR) $(PYINS_FLAGS)
+	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -Fw ../LabSupportClient.py --distpath $(PUBLISH_DIR) $(PYINS_FLAGS) --name $(CLIENT_EXE)
 
 $(CLIENT_WITH_CONSOLE): $(CLIENT_SRCS) $(PUBLISH_DIR)
 	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -F ../LabSupportClient.py --distpath=$(PUBLISH_DIR) $(PYINS_FLAGS) --name LSCWithConsole
 
 $(UPDATER): $(UPDATER_SRCS) $(PUBLISH_DIR)
-	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -F --distpath $(PUBLISH_DIR) $(PYINS_FLAGS) ../Update.py
+	$(PYTHON_EXECUTABLE) $(PYTHON_FLAGS) PyInstaller -F --distpath $(PUBLISH_DIR) $(PYINS_FLAGS) ../Update.py  --name $(UPDATER_EXE)
 
 $(JSON): $(JSON_SRC) $(PUBLISH_DIR)/$(INF_DIR)
 	cp $(JSON_SRC) $(PUBLISH_DIR)/$(INF_DIR)/
