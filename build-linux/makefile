@@ -13,7 +13,7 @@ CLIENT=$(PUBLISH_DIR)/$(CLIENT_EXE)
 CLIENT_WITH_CONSOLE=$(PUBLISH_DIR)/$(CLIENT_CON_EXE)
 UPDATER=$(PUBLISH_DIR)/$(UPDATER_EXE)
 JSON=$(PUBLISH_DIR)/$(INF_DIR)/$(INF_FILENAME)
-ZIP=$(PUBLISH_DIR)/LS_Linux.zip
+ZIP=$(PUBLISH_DIR)/LS_LINUX.zip
 
 JSON_SRC=../app/src/updates/inf.json
 CLIENT_SRCS=../LabSupportClient.py ../app/src/GUI.py ../app/src/Student.py ../app/src/config.py ../app/src/emailWriter.py ../app/src/SheetReader.py ../app/src/tooltip.py ../app/src/ui_utils.py ../app/src/platform.py ../app/src/updates/updater.py
