@@ -2,9 +2,12 @@ import sys
 import time
 from tkinter import Tk
 from tkinter.messagebox import showerror
+from typing import Union
 
 import app.src.config
 from app.src.ui_utils import show_error_and_exit
+
+
 
 try:
     import gspread
@@ -43,6 +46,8 @@ class SheetReader:
     ARRIVED = '1'
     DEFAULT = ''
 
+    QUEUE_ROW_OFFSET = 5
+
     def __init__(self, settings, close_callback=None):
 
         self.CREDENTIALS_DIRECTORY = settings.settings[
@@ -54,7 +59,7 @@ class SheetReader:
 
         # use creds to create a client to interact with the Google Drive API
         self.scope = ['https://www.googleapis.com/auth/drive']
-        self.sheet = None
+        self.sheet: Union[gspread.Worksheet, None] = None
         self.client = None
         self.creds = None
         self.reinitialize()
@@ -94,13 +99,13 @@ class SheetReader:
 
     @authenticate
     def stu_finished(self, index):
-        self.sheet.update_cell(5 + index, 5, self.FINISHED)
-        self.sheet.update_cell(5 + index, 9, f"Turned Green at: {time.asctime()}")
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 5, self.FINISHED)
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 9, f"Turned Green at: {time.asctime()}")
 
     @authenticate
     def stu_no_showed(self, index, time):
-        self.sheet.update_cell(5 + index, 5, self.NO_SHOW)
-        self.sheet.update_cell(5 + index, 4, time)
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 5, self.NO_SHOW)
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 4, time)
 
     @authenticate
     def reset_stu(self, index):
@@ -109,15 +114,23 @@ class SheetReader:
 
     @authenticate
     def mail_sent(self, index):
-        self.sheet.update_cell(5 + index, 7, "SENT")
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 7, "SENT")
 
     @authenticate
     def stu_arrived(self, index):
-        self.sheet.update_cell(5 + index, 5, self.ARRIVED)
-        self.sheet.update_cell(5 + index, 8, f"Turned Yellow at: {time.asctime()}")
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 5, self.ARRIVED)
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 8, f"Turned Yellow at: {time.asctime()}")
+
+    @authenticate
+    def clear_sheet(self, rows):
+        self.sheet.delete_rows(self.__stu_index_to_row_index(0), self.__stu_index_to_row_index(0) + rows)
+        self.sheet.append_rows([[]]*rows)
+
+    def __stu_index_to_row_index(self, index):
+        return self.QUEUE_ROW_OFFSET + index
 
     @authenticate
     def remove_stu(self, index):
-        self.sheet.delete_row(5 + index)
+        self.sheet.delete_row(self.__stu_index_to_row_index(index))
         self.sheet.append_row([])
 
