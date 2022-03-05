@@ -30,6 +30,7 @@ jobs:
     - name: New Release
       uses: ncipollo/release-action@v1.9.0
       with:
+        allowUpdates: true
         artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
   
   deploy-win:
@@ -56,4 +57,33 @@ jobs:
     - name: New Release
       uses: ncipollo/release-action@v1.9.0
       with:
+        allowUpdates: true
         artifacts: publish-win/LS_WINDOWS.zip, publish-win/Updater_Windows.exe
+
+
+  deploy-mac:
+
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: make -C build-mac venv_
+
+      - name: Run build
+        run: make -C build-mac all
+
+      - name: Update Releases
+        uses: ncipollo/release-action@v1.9.0
+        with:
+          allowUpdates: true
+          artifacts: publish-mac/LS_MACOS.zip, publish-mac/Updater_MacOs
+          name: Latest executables
+          tag: Latest
+
+      - name: New Release
+        uses: ncipollo/release-action@v1.9.0
+        with:
+          allowUpdates: true
+          artifacts: publish-mac/LS_MACOS.zip, publish-mac/Updater_MacOs
