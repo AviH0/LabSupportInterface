@@ -7,6 +7,8 @@ from time import strftime
 from tkinter import *
 import tkinter.messagebox
 import tkinter.simpledialog
+from typing import Union
+
 import gspread.exceptions
 
 from app.src.tooltip import CreateToolTip
@@ -15,6 +17,10 @@ from app.src import SheetReader
 from app.src.Student import Student
 from app.src.emailWriter import EmailWriter
 import app.src.config
+
+SEND_INVITE_MENU_OPT = 'Send Invite'
+
+CLEAR_MENU_OPT = 'Clear Queue'
 
 NO_CONNECTION = "-- No Connection --"
 
@@ -75,7 +81,7 @@ class Gui:
         self.settings = app.src.config.Settings()
 
         # Create the sheet reader moved to start loop so that we can show a dialog if the sheet is not found.
-        self.reader = None# SheetReader.SheetReader(self.settings)
+        self.reader: Union[None, SheetReader.SheetReader] = None# SheetReader.SheetReader(self.settings)
 
         # Create mail writer:
         self.mailWriter = None
@@ -553,6 +559,10 @@ class Gui:
         # self.action_button.configure(text=FINISHED_BTN_TEXT,
         #                              command=self.next_student)
 
+    def __clear_queue(self):
+        self.reader.clear_sheet(len(self.current_list) + len(self.no_shows_list))
+        self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
+
     def __right_click_menu(self, event):
         """
         Create a right click menu for a click on a student in any list.
@@ -573,11 +583,15 @@ class Gui:
         menu.add_command(label=CALL_MENU_OPT,
                          command=lambda: self.__call_stu(index))
         if self.mailWriter and stu.mail:
-            menu.add_command(label='Send Invite', command=lambda: self.__send_invite(stu))
+            menu.add_command(label=SEND_INVITE_MENU_OPT, command=lambda: self.__send_invite(stu))
 
         # if event.widget.master is self.no_shows_frame:
         menu.add_command(label=LOAD_MENU_OPT,
                          command=lambda: self.__load_no_show(event))
+
+        menu.add_separator()
+        menu.add_command(label=CLEAR_MENU_OPT, command=lambda: self.__clear_queue())
+
         menu.tk_popup(event.x_root, event.y_root)
 
     def __send_invite(self, stu):
