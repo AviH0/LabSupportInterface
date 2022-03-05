@@ -131,6 +131,6 @@ class SheetReader:
 
     @authenticate
     def remove_stu(self, index):
-        self.sheet.delete_row(self.__stu_index_to_row_index(index))
+        self.sheet.delete_rows(self.__stu_index_to_row_index(index))
         self.sheet.append_row([])
 
