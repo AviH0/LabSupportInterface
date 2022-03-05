@@ -98,6 +98,8 @@ class Settings:
 
     def save_configurations(self):
         # print("Saving configurations...")
+        if not os.path.isdir(CONFIG_DIRECTORY):
+            os.mkdir(CONFIG_DIRECTORY)
         with open(CONFIG_FILE_PATH, 'w') as file:
             file.write(
                 "// This is a config file for LabSupportClient. You may set config values as in the following "
