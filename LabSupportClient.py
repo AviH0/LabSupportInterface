@@ -1,3 +1,4 @@
+import stat
 import subprocess
 import sys
 import os
@@ -45,6 +46,7 @@ if __name__ == '__main__':
         updates_disabled = sys.argv[1] == "--no-updates"
     if not updates_disabled and updater.check_for_updates():
         fetch_updater()
+        os.chmod(UPDATER_FILE, stat.S_IXUSR | stat.S_IRUSR| stat.S_IWUSR)
         subprocess.Popen(UPDATER_FILE)
         sys.exit(0)
     from app.src import GUI

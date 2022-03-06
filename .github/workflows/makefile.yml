@@ -8,11 +8,20 @@ on:
 jobs:
   deploy-linux:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
-      
+
+
+    - name: python-tk
+      run: |
+          sudo apt-get update
+          sudo apt-get install tk
+          sudo apt-get install --upgrade python3
+          sudo apt-get install python3-venv
+          sudo apt-get install python3-tk
+
     - name: Install dependencies
       run: make -C build-linux venv_
       
@@ -63,7 +72,7 @@ jobs:
 
   deploy-mac:
 
-    runs-on: macos-latest
+    runs-on: macos-10.15
 
     steps:
       - uses: actions/checkout@v2
