@@ -12,7 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      
+
+    - name: python-tk
+      run: sudo apt-get install python3-tk
+
     - name: Install dependencies
       run: make -C build-linux venv_
       
