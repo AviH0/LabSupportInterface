@@ -17,7 +17,7 @@ jobs:
     - name: python-tk
       run: |
           sudo apt-get update
-          sudo apt-get rmove python3
+          sudo apt-get remove python3
           sudo apt-get install tk python3.7 python3-venv
 
     - name: Install dependencies
