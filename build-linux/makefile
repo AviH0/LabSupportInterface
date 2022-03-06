@@ -71,7 +71,7 @@ $(PUBLISH_DIR)/$(INF_DIR): $(PUBLISH_DIR)/$(SRC_DIR)
 	[ -d "$(PUBLISH_DIR)/$(INF_DIR)" ] || mkdir $(PUBLISH_DIR)/$(INF_DIR)
 
 $(PYTHON_EXECUTABLE):
-	python3 -m venv ../venv
+	python3-tk -m venv ../venv
 
 .PHONY:
 venv_: $(PYTHON_EXECUTABLE)
