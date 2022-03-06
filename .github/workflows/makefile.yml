@@ -21,6 +21,7 @@ jobs:
           sudo apt-get install tk
           sudo apt-get install python3
           sudo apt-get install python3-venv
+          sudo apt-get install python3-tk
 
     - name: Install dependencies
       run: make -C build-linux venv_
