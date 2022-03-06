@@ -76,7 +76,7 @@ $(PYTHON_EXECUTABLE):
 .PHONY:
 venv_: $(PYTHON_EXECUTABLE)
 	$(PYTHON_EXECUTABLE) -m pip install wheel
-	$(PYTHON_EXECUTABLE) -m pip install PyInstaller
+	$(PYTHON_EXECUTABLE) -m pip install PyInstaller==4.0
 	$(PYTHON_EXECUTABLE) -m pip install gspread
 	$(PYTHON_EXECUTABLE) -m pip install oauth2client
 	$(PYTHON_EXECUTABLE) -m pip install google-api-python-client
