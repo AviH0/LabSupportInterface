@@ -18,7 +18,9 @@ jobs:
       run: |
           sudo apt-get update
           sudo apt-get remove python3
-          sudo apt-get install tk python3.7 python3-venv
+          sudo apt-get install tk
+          sudo apt-get install python3
+          sudo apt-get install python3-venv
 
     - name: Install dependencies
       run: make -C build-linux venv_
