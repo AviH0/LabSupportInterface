@@ -1,4 +1,5 @@
 import shutil
+import stat
 import subprocess
 import sys
 
@@ -25,6 +26,7 @@ def do_update():
         __copy_update()
         __clean_up()
         print("Update successful.")
+        os.chmod(MAIN_EXE_NAME, stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR)
         subprocess.Popen(MAIN_EXE_NAME)
         sys.exit(0)
         return True
