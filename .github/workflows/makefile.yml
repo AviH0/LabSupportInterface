@@ -13,8 +13,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+
     - name: python-tk
-      run: sudo apt-get install tk python3.7 python3-venv
+      run: |
+          sudo apt-get update
+          sudo apt-get rmove python3
+          sudo apt-get install tk python3.7 python3-venv
 
     - name: Install dependencies
       run: make -C build-linux venv_
