@@ -26,12 +26,14 @@ jobs:
         artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
         name: Latest executables
         tag: Latest
+        generateReleaseNotes: true
     
     - name: New Release
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
         artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
+        generateReleaseNotes: true
   
   deploy-win:
 
@@ -53,12 +55,14 @@ jobs:
         artifacts: publish-win/LS_WINDOWS.zip, publish-win/Updater_Windows.exe
         name: Latest executables
         tag: Latest
+        generateReleaseNotes: true
         
     - name: New Release
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
         artifacts: publish-win/LS_WINDOWS.zip, publish-win/Updater_Windows.exe
+        generateReleaseNotes: true
 
 
   deploy-mac:
@@ -81,9 +85,11 @@ jobs:
           artifacts: publish-mac/LS_MACOS.zip, publish-mac/Updater_MacOs
           name: Latest executables
           tag: Latest
+          generateReleaseNotes: true
 
       - name: New Release
         uses: ncipollo/release-action@v1.9.0
         with:
           allowUpdates: true
           artifacts: publish-mac/LS_MACOS.zip, publish-mac/Updater_MacOs
+          generateReleaseNotes: true
