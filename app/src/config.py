@@ -91,13 +91,16 @@ class Settings:
                     line = file.readline()
 
             for line in lines:
-                key, value = line.split('=')
+                index = line.index('=')
+                key, value = line[:index], line[index+1:]
                 self.settings[key] = value.strip()[1:-1]
         else:
             print("Cannot find config file, falling back on default settings.")
 
     def save_configurations(self):
         # print("Saving configurations...")
+        if not os.path.isdir(CONFIG_DIRECTORY):
+            os.mkdir(CONFIG_DIRECTORY)
         with open(CONFIG_FILE_PATH, 'w') as file:
             file.write(
                 "// This is a config file for LabSupportClient. You may set config values as in the following "
