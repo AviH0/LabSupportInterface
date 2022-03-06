@@ -91,7 +91,8 @@ class Settings:
                     line = file.readline()
 
             for line in lines:
-                key, value = line.split('=')
+                index = line.index('=')
+                key, value = line[:index], line[index+1:]
                 self.settings[key] = value.strip()[1:-1]
         else:
             print("Cannot find config file, falling back on default settings.")
