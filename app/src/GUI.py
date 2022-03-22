@@ -355,7 +355,8 @@ class Gui:
             name.pack(anchor=W, fill=X, expand=True)
             text = TIMESTAMP.format(stu.timestamp)
             if stu.sent_mail:
-                text += ' (Mail Invite Sent)'
+                hour = strftime(DATETIME_FORMAT, localtime())
+                text += f' (Mail Invite Sent {hour})'
             CreateToolTip(name, text)
 
         # Clear the current list of no-shows:
@@ -379,7 +380,8 @@ class Gui:
             name.pack(anchor=W, fill=X, expand=True)
             text = TIMESTAMP.format(stu.timestamp)
             if stu.sent_mail:
-                text += ' (Mail Invite Sent)'
+                hour = strftime(DATETIME_FORMAT, localtime())
+                text += f' (Mail Invite Sent {hour})'
             CreateToolTip(name, text)
 
         # Set the current information to display:
