@@ -114,7 +114,8 @@ class SheetReader:
 
     @authenticate
     def mail_sent(self, index):
-        self.sheet.update_cell(self.__stu_index_to_row_index(index), 7, "SENT")
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 7,
+                               f"SENT AT {time.strftime('%H:%M', time.localtime())}")
 
     @authenticate
     def stu_arrived(self, index):
