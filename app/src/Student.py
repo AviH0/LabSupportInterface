@@ -1,6 +1,7 @@
 import datetime
 import re
 import os
+from time import localtime, strftime
 
 OS = os.name
 
@@ -18,6 +19,7 @@ class Student:
             self.status = stu.status
             self.index = stu.index
             self.mail = stu.mail
+            self.sent_mail_timestamp = stu.sent_mail_timestamp
         else:
             self.timestamp = row[0]
             self.name = self.fix_hebrew(
@@ -37,6 +39,7 @@ class Student:
                 self.mail = row[5]
             if len(row) > 6:
                 self.sent_mail = row[6] != ''
+                self.sent_mail_timestamp = row[6][8:]
 
     def fix_hebrew(self, string: str):
         if not is_linux:
