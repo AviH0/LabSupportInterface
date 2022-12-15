@@ -19,6 +19,9 @@ from app.src.Student import Student
 from app.src.emailWriter import EmailWriter
 import app.src.config
 
+
+
+
 SEND_INVITE_MENU_OPT = 'Send Invite'
 
 CLEAR_MENU_OPT = 'Clear Queue'
@@ -80,6 +83,10 @@ class Gui:
 
         # Create settings instance:
         self.settings = app.src.config.Settings()
+
+        self.RIGHT_CLICK_BUTTON = "<Button-3>"
+        if self.settings.settings[app.src.config.IS_ANDROID]:
+            self.RIGHT_CLICK_BUTTON = "<Button-2>"
 
         # Create the sheet reader moved to start loop so that we can show a dialog if the sheet is not found.
         self.reader: Union[None, SheetReader.SheetReader] = None# SheetReader.SheetReader(self.settings)
@@ -351,7 +358,7 @@ class Gui:
                          bg=color, anchor=W,
                          font=BODY_FONT,
                          justify=LEFT, width=500)
-            name.bind("<Button-3>", lambda event: self.__right_click_menu(event))
+            name.bind(self.RIGHT_CLICK_BUTTON, lambda event: self.__right_click_menu(event))
             name.pack(anchor=W, fill=X, expand=True)
             text = TIMESTAMP.format(stu.timestamp)
             if stu.sent_mail:
@@ -375,7 +382,7 @@ class Gui:
                          justify=LEFT, width=500)
             name.bind("<Double-Button-1>",
                       lambda event: self.__load_no_show(event))
-            name.bind("<Button-3>", lambda event: self.__right_click_menu(event))
+            name.bind(self.RIGHT_CLICK_BUTTON, lambda event: self.__right_click_menu(event))
             name.pack(anchor=W, fill=X, expand=True)
             text = TIMESTAMP.format(stu.timestamp)
             if stu.sent_mail:
