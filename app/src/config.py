@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-
+import app.src.platform
 
 TITLE = "Settings"
 
@@ -28,7 +28,7 @@ class Settings:
                          INVITE_MSG_BODY: os.path.join(os.path.curdir, 'app', 'config',"email_message.txt"),
                          MAIL_ACCOUNT_CREDS: os.path.join(os.path.curdir, 'app', 'credentials',"mail_account_secret.json"),
                          PATH_TO_CLIENT_SECRET: os.path.join(os.path.curdir, 'app', 'credentials',"client_secret_637398666132-j8s19q7egap0u79l894jmuhauiv39ec7.apps.googleusercontent.com.json"),
-                         IS_ANDROID: False}
+                         IS_ANDROID: app.src.platform.IS_ANDROID}
 
         self.new_settings = {key: None for key in self.settings.keys()}
         self.load_configurations()
