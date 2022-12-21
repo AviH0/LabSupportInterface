@@ -10,22 +10,22 @@ jobs:
 
     runs-on: ubuntu-18.04
 
-      steps:
-        - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-        - name: Create Source Zip
-          - run: |
-              mkdir -p release
-              zip release/LS_PYTHON.zip -r app *.py *.md
-              cp Update.py release/Updater_Python.py
+      - name: Create Source Zip
+        - run: |
+            mkdir -p release
+            zip release/LS_PYTHON.zip -r app *.py *.md
+            cp Update.py release/Updater_Python.py
 
-        - name: New Release
-          uses: ncipollo/release-action@v1.9.0
-          with:
-            allowUpdates: true
-            generateNotes: true
-            makeLatest: true
-            artifacts: release/LS_PYTHON.zip, release/Updater_Python.py
+      - name: New Release
+        uses: ncipollo/release-action@v1.9.0
+        with:
+          allowUpdates: true
+          generateNotes: true
+          makeLatest: true
+          artifacts: release/LS_PYTHON.zip, release/Updater_Python.py
 
   deploy-linux:
     needs: create-new-release
