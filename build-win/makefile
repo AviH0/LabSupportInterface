@@ -78,6 +78,7 @@ $(PYTHON_EXECUTABLE):
 
 .PHONY:
 venv_: $(PYTHON_EXECUTABLE)
+	$(PYTHON_EXECUTABLE) -m pip install wheel
 	$(PYTHON_EXECUTABLE) -m pip install -r ../build-generic/requirements.txt
 
 test_script:

@@ -6,13 +6,33 @@ on:
         - '*'
 
 jobs:
-  deploy-linux:
+  create-new-release:
 
+    runs-on: ubuntu-18.04
+
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Create Source Zip
+          - run: |
+              mkdir -p release
+              zip release/LS_PYTHON.zip -r app *.py *.md
+              cp Update.py release/Updater_Python.py
+
+        - name: New Release
+          uses: ncipollo/release-action@v1.9.0
+          with:
+            allowUpdates: true
+            generateNotes: true
+            makeLatest: true
+            artifacts: release/LS_PYTHON.zip, release/Updater_Python.py
+
+  deploy-linux:
+    needs: create-new-release
     runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
-
 
     - name: python-tk
       run: |
@@ -27,23 +47,16 @@ jobs:
       
     - name: Run build
       run: make -C build-linux all
-      
-    - name: Update Releases
-      uses: ncipollo/release-action@v1.9.0
-      with:
-        allowUpdates: true
-        artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
-        name: Latest executables
-        tag: Latest
 
-    - name: New Release
+    - name: Add to New Release
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
+        omitBodyDuringUpdate: true
         artifacts: publish-linux/LS_LINUX.zip, publish-linux/Updater_Linux
 
   deploy-win:
-
+    needs: create-new-release
     runs-on: windows-latest
 
     steps:
@@ -54,24 +67,16 @@ jobs:
       
     - name: Run build
       run: make -C build-win all
-      
-    - name: Update Releases
+
+    - name: Add to New Release
       uses: ncipollo/release-action@v1.9.0
       with:
         allowUpdates: true
+        omitBodyDuringUpdate: true
         artifacts: publish-win/LS_WINDOWS.zip, publish-win/Updater_Windows.exe
-        name: Latest executables
-        tag: Latest
-
-    - name: New Release
-      uses: ncipollo/release-action@v1.9.0
-      with:
-        allowUpdates: true
-        artifacts: publish-win/LS_WINDOWS.zip, publish-win/Updater_Windows.exe
-
 
   deploy-mac:
-
+    needs: create-new-release
     runs-on: macos-10.15
 
     steps:
@@ -83,16 +88,9 @@ jobs:
       - name: Run build
         run: make -C build-mac all
 
-      - name: Update Releases
+      - name: Add to New Release
         uses: ncipollo/release-action@v1.9.0
         with:
           allowUpdates: true
-          artifacts: publish-mac/LS_MACOS.zip, publish-mac/Updater_MacOs
-          name: Latest executables
-          tag: Latest
-
-      - name: New Release
-        uses: ncipollo/release-action@v1.9.0
-        with:
-          allowUpdates: true
+          omitBodyDuringUpdate: true
           artifacts: publish-mac/LS_MACOS.zip, publish-mac/Updater_MacOs
