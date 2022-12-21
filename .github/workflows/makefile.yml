@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-      - name: Create Source Zip
       - uses: actions/checkout@v2
-        - run: |
+
+      - name: Create Source Zip
+        run: |
             mkdir -p release
             zip release/LS_PYTHON.zip -r app *.py *.md
             cp Update.py release/Updater_Python.py
