@@ -2,9 +2,9 @@ import sys
 
 
 PYTHON_UPDATER_URL = 'https://github.com/AviH0/LabSupportInterface/releases/latest/download/Updater_Python.py'
-PYTHON_UPDATER_FILE = 'python3 Update.py'
-PYTHON_MAIN_EXE_NAME = "python3 LabSupportClient.py"
-PYTHON_DEFAULT_URL = "https://github.com/AviH0/LabSupportInterface/releases/latest/download/LS_Python.zip"
+PYTHON_UPDATER_FILE = 'Update.py'
+PYTHON_MAIN_EXE_NAME = "LabSupportClient.py"
+PYTHON_DEFAULT_URL = "https://github.com/AviH0/LabSupportInterface/releases/latest/download/LS_PYTHON.zip"
 
 IS_ANDROID = False
 

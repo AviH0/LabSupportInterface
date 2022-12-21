@@ -47,7 +47,10 @@ if __name__ == '__main__':
     if not updates_disabled and updater.check_for_updates():
         fetch_updater()
         os.chmod(UPDATER_FILE, stat.S_IXUSR | stat.S_IRUSR| stat.S_IWUSR)
-        subprocess.Popen(UPDATER_FILE)
+        if UPDATER_FILE.endswith(".py"):
+            subprocess.Popen([sys.executable, UPDATER_FILE])
+        else:
+            subprocess.Popen(UPDATER_FILE)
         sys.exit(0)
     from app.src import GUI
     gui = GUI.Gui()

@@ -27,7 +27,10 @@ def do_update():
         __clean_up()
         print("Update successful.")
         os.chmod(MAIN_EXE_NAME, stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR)
-        subprocess.Popen(MAIN_EXE_NAME)
+        if MAIN_EXE_NAME.endswith(".py"):
+            subprocess.Popen([sys.executable, MAIN_EXE_NAME])
+        else:
+            subprocess.Popen(MAIN_EXE_NAME)
         sys.exit(0)
         return True
     else:
