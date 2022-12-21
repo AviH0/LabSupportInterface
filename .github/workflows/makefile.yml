@@ -11,9 +11,8 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-      - uses: actions/checkout@v2
-
       - name: Create Source Zip
+      - uses: actions/checkout@v2
         - run: |
             mkdir -p release
             zip release/LS_PYTHON.zip -r app *.py *.md
