@@ -83,7 +83,7 @@ class Settings:
     def load_configurations(self):
         if os.path.isfile(CONFIG_FILE_PATH):
             lines = []
-            with open(CONFIG_FILE_PATH, 'r') as file:
+            with open(CONFIG_FILE_PATH, 'r', encoding='utf-8') as file:
                 line = file.readline()
                 while line:
                     # Erase all leading and trailing white spaces:
@@ -121,7 +121,7 @@ class Settings:
         # print("Saving configurations...")
         if not os.path.isdir(CONFIG_DIRECTORY):
             os.mkdir(CONFIG_DIRECTORY)
-        with open(CONFIG_FILE_PATH, 'w') as file:
+        with open(CONFIG_FILE_PATH, 'w', encoding='utf-8') as file:
             file.write(
                 "// This is a config file for LabSupportClient. You may set config values as in the following "
                 "example:\n// credentials location=\"path\\to\\credentials\"\n// Lines starting with '//' "
