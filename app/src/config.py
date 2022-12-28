@@ -16,7 +16,8 @@ INVITE_MSG_BODY = 'Invite Message File'
 MAIL_ACCOUNT_CREDS = 'Mail Account Credentials'
 
 IS_ANDROID = 'Adjust for Android'
-
+MAIL_SENDER_NAME = "Email Sender Name"
+MAIL_SENDER_SUBJECT = "Email Subject"
 
 class Settings:
 
@@ -27,6 +28,8 @@ class Settings:
                          SESSION_LINK: '',
                          INVITE_MSG_BODY: os.path.join(os.path.curdir, 'app', 'config',"email_message.txt"),
                          MAIL_ACCOUNT_CREDS: os.path.join(os.path.curdir, 'app', 'credentials',"mail_account_secret.json"),
+                         MAIL_SENDER_NAME: "LabSupportCS",
+                         MAIL_SENDER_SUBJECT: "Lab Support",
                          PATH_TO_CLIENT_SECRET: os.path.join(os.path.curdir, 'app', 'credentials',"client_secret_637398666132-j8s19q7egap0u79l894jmuhauiv39ec7.apps.googleusercontent.com.json"),
                          IS_ANDROID: app.src.platform.IS_ANDROID}
 

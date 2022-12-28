@@ -54,7 +54,7 @@ class EmailWriter:
         with open(message_file) as f:
             message_body = f.read()
         message_text = message_body + link
-        message = self.create_message("labsupportcs", address, 'LAB SUPPORT', message_text)
+        message = self.create_message(self.settings.settings[app.src.config.MAIL_SENDER_NAME], address, self.settings.settings[app.src.config.MAIL_SENDER_SUBJECT], message_text)
         self.send_message(message)
 
     def authorize_new_account(self, force=True):
