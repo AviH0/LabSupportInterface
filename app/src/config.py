@@ -49,14 +49,16 @@ class Settings:
             name = tk.Label(settings_frame, text=key, justify=tk.LEFT)
             name.grid(row=index, column=0, padx=5, sticky=tk.W, pady=10)
             if type(self.settings[key]) == bool:
-                value = tk.Checkbutton(settings_frame, variable=self.new_settings[key]).grid(row=index, column=1)
-                value.select() if self.settings[key] else value.deselect()
-                value = tk.BooleanVar()
+                boolvar = tk.BooleanVar(value=self.settings[key])
+                value = tk.Checkbutton(settings_frame, variable=boolvar)
+                value.grid(row=index, column=1)
+                # value.select() if self.settings[key] else value.deselect()
+                value = boolvar
             else:
                 value = tk.Entry(settings_frame)
                 value.insert(0, self.settings[key])
                 value.config(width=100)
-            value.grid(row=index, column=1, sticky=tk.E)
+                value.grid(row=index, column=1, sticky=tk.E)
             self.new_settings[key] = value
 
         auth_mail_button = tk.Button(settings_frame, text="Authorize Gmail Account", command=lambda: gui.mailWriter.authorize_new_account())
