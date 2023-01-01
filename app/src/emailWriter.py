@@ -51,7 +51,7 @@ class EmailWriter:
 
     def send_message_with_link(self, address, link):
         message_file = self.settings.settings[app.src.config.INVITE_MSG_BODY]
-        with open(message_file) as f:
+        with open(message_file, encoding='utf-8') as f:
             message_body = f.read()
         message_text = message_body + link
         message = self.create_message(self.settings.settings[app.src.config.MAIL_SENDER_NAME], address, self.settings.settings[app.src.config.MAIL_SENDER_SUBJECT], message_text)
