@@ -4,6 +4,8 @@ import asyncio
 import json
 import queue
 import threading
+import time
+from datetime import timedelta
 from time import localtime
 from time import strftime
 from tkinter import *
@@ -227,6 +229,9 @@ class Gui:
                                            wraplength=INFO_WRAPLENGTH)
         self.current_student_label.grid(row=1, column=0, sticky=NW, padx=INFO_TXT_PADX)
 
+        self.current_elapsed_time = Label(self.root, font=HEADER2_FONT, anchor=W, justify=LEFT, wraplength=INFO_WRAPLENGTH)
+        self.current_elapsed_time.grid(row=2, column=0, sticky=NW, padx=INFO_TXT_PADX)
+
         button_frame = Frame(self.root, width=BTN_FRM_WIDTH)
 
         self.action_button = Button(button_frame, text=ARRIVED_BTN_TEXT,
@@ -266,7 +271,7 @@ class Gui:
     async def get_info_loop(self):
         while True:
             await self.__get_info()
-            await asyncio.sleep(5)
+            await asyncio.sleep(1)
 
     def __select_sheet(self):
         # Create a new temporary "parent"
@@ -315,6 +320,8 @@ class Gui:
         for index, row in enumerate(rows):
             # Create the students and add them to the right list.
             stu = Student(row, index)
+            if self.current_student is not None and stu.timestamp == self.current_student.timestamp:
+                self.current_student = stu
             if stu.status == SheetReader.SheetReader.NO_SHOW:
                 no_show_list.append(stu)
             # elif stu.status == SheetReader.SheetReader.FINISHED:  # Automatically delete greens? reds?
@@ -401,19 +408,38 @@ class Gui:
 
         # Get the current status and set the buttons accordingly:
         if self.current_status == HELPING:
+            text = HELPING_STU_PRFX + '\n' + \
+                   name + '\n\n' + \
+                   TOPIC + '\n' + \
+                   topic + '\n\n'
             self.current_student_label.configure(
-                text=HELPING_STU_PRFX + '\n' + name + '\n\n' + TOPIC + '\n' + topic)
+                text=text)
             self.action_button.configure(text=FINISHED_BTN_TEXT,
                                          command=self.__next_student)
             self.no_show_button.configure(state=DISABLED)
+            self.__update_timer()
 
         elif self.current_status == WAITING:
+            text = WAITING_STU_PRFX + '\n' +\
+                   name + '\n\n' + \
+                   TOPIC + '\n' + \
+                   topic + '\n\n'
             self.current_student_label.configure(
-                text=WAITING_STU_PRFX + '\n' + name + '\n\n' + TOPIC + '\n' + topic)
+                text=text)
             self.no_show_button.configure(state=NORMAL)
 
             self.action_button.configure(text=ARRIVED_BTN_TEXT,
                                          command=self.__student_arrived)
+            self.__update_timer()
+
+    def __update_timer(self):
+        if not self.current_student:
+            return
+        student_last_time = (self.current_student.time_arrived if self.current_status == HELPING else self.current_student.time_called)
+        time_elapsed = time.time() - time.mktime(student_last_time)
+        text = "Time Elapsed: " + time.strftime("%H:%M:%S", time.gmtime(time_elapsed))
+        self.current_elapsed_time.configure(text=text)
+        self.root.after(1000, self.__update_timer)
 
     def __student_arrived(self):
         """
@@ -423,6 +449,7 @@ class Gui:
         if not self.current_student:
             return
         self.current_status = HELPING
+        self.reader.stu_arrived(self.current_student.index)
         self.root.after(1, self.draw)
 
     def __next_student(self, finished=True):
@@ -462,7 +489,7 @@ class Gui:
             return
 
         # A student was selected, change his status to yellow.
-        self.reader.stu_arrived(self.current_student.index)
+        self.reader.call_stu(self.current_student.index)
 
         # Status is now Waiting
         self.current_status = WAITING
@@ -524,7 +551,7 @@ class Gui:
 
         stu = self.__stu_from_index(index)
         self.current_student = stu
-        self.reader.stu_arrived(stu.index)
+        self.reader.call_stu(stu.index)
         self.current_status = WAITING
 
         self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))

@@ -100,7 +100,7 @@ class SheetReader:
     @authenticate
     def stu_finished(self, index):
         self.sheet.update_cell(self.__stu_index_to_row_index(index), 5, self.FINISHED)
-        self.sheet.update_cell(self.__stu_index_to_row_index(index), 9, f"Turned Green at: {time.asctime()}")
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 10, f"Turned Green at: {time.asctime()}")
 
     @authenticate
     def stu_no_showed(self, index, time):
@@ -118,9 +118,14 @@ class SheetReader:
                                f"SENT AT {time.strftime('%H:%M', time.localtime())}")
 
     @authenticate
-    def stu_arrived(self, index):
+    def call_stu(self, index):
         self.sheet.update_cell(self.__stu_index_to_row_index(index), 5, self.ARRIVED)
         self.sheet.update_cell(self.__stu_index_to_row_index(index), 8, f"Turned Yellow at: {time.asctime()}")
+
+    @authenticate
+    def stu_arrived(self, index):
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 5, self.ARRIVED)
+        self.sheet.update_cell(self.__stu_index_to_row_index(index), 9, f"Arrived at: {time.asctime()}")
 
     @authenticate
     def clear_sheet(self, rows):

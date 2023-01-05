@@ -1,6 +1,7 @@
 import datetime
 import re
 import os
+import time
 from time import localtime, strftime
 
 OS = os.name
@@ -20,8 +21,11 @@ class Student:
             self.index = stu.index
             self.mail = stu.mail
             self.sent_mail_timestamp = stu.sent_mail_timestamp
+            self.time_called = stu.time_called
+            self.time_arrived = stu.time_arrived
         else:
             self.timestamp = row[0]
+
             self.name = self.fix_hebrew(
                 str(row[1]).encode(encoding='cp424', errors='replace').decode(encoding='cp424',
                                                                               errors='replace'))
@@ -40,6 +44,10 @@ class Student:
             if len(row) > 6:
                 self.sent_mail = row[6] != ''
                 self.sent_mail_timestamp = row[6][8:]
+            if len(row) > 7 and row[7]:
+                self.time_called = time.strptime(row[7].split(': ')[1])
+            if len(row) > 8 and row[8]:
+                self.time_arrived = time.strptime(row[8].split(': ')[1])
 
     def fix_hebrew(self, string: str):
         if not is_linux:
