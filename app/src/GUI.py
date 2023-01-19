@@ -18,10 +18,8 @@ from app.src.tooltip import CreateToolTip
 from app.src import SheetReader
 from app.src.Student import Student
 from app.src.emailWriter import EmailWriter
+from app.src.student_list_item import StudentListItem
 import app.src.config
-
-
-
 
 SEND_INVITE_MENU_OPT = 'Send Invite'
 
@@ -47,8 +45,7 @@ HELPING_STU_PRFX = "Receiving Assistance: "
 WAITING_STU_PRFX = "Waiting for: "
 
 TOPIC = 'Issue: '
-NAME = 'Name: '
-TIMESTAMP = 'Added: {}'
+
 NO_SHOW_LIST_TITLE = "Missed Appointments"
 STUDENT_LIST_TITLE = "Waiting List"
 
@@ -90,7 +87,7 @@ class Gui:
             self.RIGHT_CLICK_BUTTON = "<Button-2>"
 
         # Create the sheet reader moved to start loop so that we can show a dialog if the sheet is not found.
-        self.reader: Union[None, SheetReader.SheetReader] = None# SheetReader.SheetReader(self.settings)
+        self.reader: Union[None, SheetReader.SheetReader] = None  # SheetReader.SheetReader(self.settings)
 
         # Create mail writer:
         self.mailWriter = None
@@ -273,9 +270,13 @@ class Gui:
         newWin = Tk()
         # But make it invisible
         newWin.withdraw()
-        name = tkinter.simpledialog.askstring("Enter SpreadSheet Name", "Could not find Spreadsheet, please enter a valid spreadsheet name", initialvalue=f"{self.settings.settings[app.src.config.SOURCE_SPREADSHEET]}", parent=newWin)
+        name = tkinter.simpledialog.askstring("Enter SpreadSheet Name",
+                                              "Could not find Spreadsheet, please enter a valid spreadsheet name",
+                                              initialvalue=f"{self.settings.settings[app.src.config.SOURCE_SPREADSHEET]}",
+                                              parent=newWin)
         if not name:
-            tkinter.messagebox.showerror("Fatal Error!", "Could not find specified spreadsheet.\nExiting.", parent=newWin)
+            tkinter.messagebox.showerror("Fatal Error!", "Could not find specified spreadsheet.\nExiting.",
+                                         parent=newWin)
             newWin.destroy()
             self.close()
         newWin.destroy()
@@ -325,7 +326,10 @@ class Gui:
         need_to_redraw = rows != self.current_data
 
         # If there were no students waiting and now there are, notify.
-        if not self.current_student and len(list(filter(lambda x: (x.status != '1' and x.status != '3'), new_list))) >= 1 and len(list(filter(lambda x: (x.status != '1' and x.status != '3') if x != 'INIT' else True, self.current_list))) == 0:
+        if not self.current_student and len(
+                list(filter(lambda x: (x.status != '1' and x.status != '3'), new_list))) >= 1 and len(
+                list(filter(lambda x: (x.status != '1' and x.status != '3') if x != 'INIT' else True,
+                            self.current_list))) == 0:
             self.notify()
 
         self.current_list = new_list
@@ -354,17 +358,10 @@ class Gui:
                 # If the student has a specific status, color him.
                 color = COLOR_FROM_STATUS[stu.status]
             # Add to the frame:
-            name = Label(self.names_frame,
-                         text=INDEX.format(stu.index + 1) + NAME + stu.name + ', ' + TOPIC + stu.topic,
-                         bg=color, anchor=W,
-                         font=BODY_FONT,
-                         justify=LEFT, width=500)
-            name.bind(self.RIGHT_CLICK_BUTTON, lambda event: self.__right_click_menu(event))
-            name.pack(anchor=W, fill=X, expand=True)
-            text = TIMESTAMP.format(stu.timestamp)
-            if stu.sent_mail:
-                text += f' (Mail Invite Sent {stu.sent_mail_timestamp})'
-            CreateToolTip(name, text)
+            stu_list_item = StudentListItem(self.names_frame, stu, color, anchor=W, font=BODY_FONT,
+                                            justify=LEFT, width=500)
+            stu_list_item.bind(self.RIGHT_CLICK_BUTTON, lambda event: self.__right_click_menu(event))
+            stu_list_item.pack(anchor=W, fill=X, expand=True)
 
         # Clear the current list of no-shows:
         for slave in self.no_shows_frame.pack_slaves():
@@ -376,19 +373,13 @@ class Gui:
             else:
                 color = 'orange'
             # Add to the frame:
-            name = Label(self.no_shows_frame,
-                         text=INDEX.format(stu.index + 1) + NAME + stu.name + ', ' + TOPIC + stu.topic,
-                         bg=color, anchor=W,
-                         font=BODY_FONT,
-                         justify=LEFT, width=500)
-            name.bind("<Double-Button-1>",
-                      lambda event: self.__load_no_show(event))
-            name.bind(self.RIGHT_CLICK_BUTTON, lambda event: self.__right_click_menu(event))
-            name.pack(anchor=W, fill=X, expand=True)
-            text = TIMESTAMP.format(stu.timestamp)
-            if stu.sent_mail:
-                text += f' (Mail Invite Sent {stu.sent_mail_timestamp})'
-            CreateToolTip(name, text)
+            stu_list_item = StudentListItem(self.no_shows_frame, stu, color, anchor=W, font=BODY_FONT,
+                                            justify=LEFT, width=500)
+
+            stu_list_item.bind("<Double-Button-1>",
+                               lambda event: self.__load_no_show(event))
+            stu_list_item.bind(self.RIGHT_CLICK_BUTTON, lambda event: self.__right_click_menu(event))
+            stu_list_item.pack(anchor=W, fill=X, expand=True)
 
         # Set the current information to display:
         name = ""
@@ -484,7 +475,7 @@ class Gui:
         self.no_show_button.configure(state=DISABLED)
         self.root.after(1, lambda: self.__next_student(False))
 
-    def __load_student(self, index):
+    def __load_student(self, stu):
         """
         Start helping a student from either list.
         :param index: His place in the list on the spreadsheet. (should only change when students are deleted)
@@ -499,14 +490,12 @@ class Gui:
 
         # Update the list, get the student by his index, start helping him.
         asyncio.get_event_loop().run_until_complete(self.__get_info())
-
-        stu = self.__stu_from_index(index)
         self.current_student = stu
         self.reader.stu_arrived(stu.index)
         self.current_status = HELPING
         self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
 
-    def __call_stu(self, index):
+    def __call_stu(self, stu: Student):
         """
         Make this student yellow but don't start helping him yet.
         :param index: His place in the list on the spreadsheet. (should only change when students are deleted)
@@ -522,25 +511,11 @@ class Gui:
         # Update the list, get the student by his index, make him yellow:
         asyncio.get_event_loop().run_until_complete(self.__get_info())
 
-        stu = self.__stu_from_index(index)
         self.current_student = stu
         self.reader.stu_arrived(stu.index)
         self.current_status = WAITING
 
         self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
-
-    def __stu_from_index(self, index):
-        """
-        Get a student by his index.
-        :param index: His place in the list on the spreadsheet. (should only change when students are deleted)
-        :return: The student that has this index and is in one of the lists.
-        """
-        for stu in self.current_list:
-            if stu.index == index:
-                return stu
-        for stu in self.no_shows_list:
-            if stu.index == index:
-                return stu
 
     def __load_no_show(self, event):
         """
@@ -549,12 +524,9 @@ class Gui:
         :param event: menu-click event
         :return: Nothing
         """
-        # Parse this student's index (ugly but it works for now):
-        name = event.widget.cget('text')
-        index = self.get_index_from_name(name)
-
+        student = event.widget.get_student()
         # Load him up:
-        self.__load_student(index)
+        self.__load_student(student)
         # self.reader.reset_stu(index)
         # if self.current_status == HELPING:
         #     self.next_student()
@@ -579,20 +551,18 @@ class Gui:
         :return: Nothing
         """
         # Parse this student's index (ugly but it works for now):
-        name = event.widget.cget('text')
-        index = self.get_index_from_name(name)
-        stu = self.__stu_from_index(index)
+        student = event.widget.get_student()
 
         # Create the menu options and bindings:
         menu = Menu(event.widget, tearoff=0)
         menu.add_command(label=RESET_MENU_OPT,
-                         command=lambda: self.__reset_stu(index))
+                         command=lambda: self.__reset_stu(student))
         menu.add_command(label=REMOVE_MENU_OPT,
-                         command=lambda: self.__remove_stu(index))
+                         command=lambda: self.__remove_stu(student))
         menu.add_command(label=CALL_MENU_OPT,
-                         command=lambda: self.__call_stu(index))
-        if self.mailWriter and stu.mail:
-            menu.add_command(label=SEND_INVITE_MENU_OPT, command=lambda: self.__send_invite(stu))
+                         command=lambda: self.__call_stu(student))
+        if self.mailWriter and student.mail:
+            menu.add_command(label=SEND_INVITE_MENU_OPT, command=lambda: self.__send_invite(student))
 
         # if event.widget.master is self.no_shows_frame:
         menu.add_command(label=LOAD_MENU_OPT,
@@ -610,31 +580,31 @@ class Gui:
         self.reader.mail_sent(stu.index)
         self.mailWriter.send_message_with_link(stu.mail, self.settings.settings[app.src.config.SESSION_LINK])
 
-    def __reset_stu(self, index):
+    def __reset_stu(self, stu: Student):
         """
         Reset the status on a student.
         :param index: His place in the list on the spreadsheet. (should only change when students are deleted)
         :return: Nothing
         """
         # Reset him:
-        self.reader.reset_stu(index)
+        self.reader.reset_stu(stu.index)
         asyncio.get_event_loop().run_until_complete(self.__get_info())
 
         # If he was the current student, get the next one:
-        if self.current_student and index is self.current_student.index:
+        if self.current_student and stu.index is self.current_student.index:
             self.current_student = None
             # self.__next_student(False)
         else:
             self.root.after(1, lambda: asyncio.get_event_loop().run_until_complete(self.__get_info()))
 
-    def __remove_stu(self, index):
+    def __remove_stu(self, stu: Student):
         """
         Remove this student from the list entirely.
         :param index: His place in the list on the spreadsheet. (should only change when students are deleted)
         :return: Nothing
         """
         # Remove him:
-        self.reader.remove_stu(index)
+        self.reader.remove_stu(stu.index)
         asyncio.get_event_loop().run_until_complete(self.__get_info())
         # Indexes have changed, so find where the current student is now and load him:
         if self.current_student:
@@ -660,19 +630,8 @@ class Gui:
         except json.JSONDecodeError:
             return
 
-    @staticmethod
-    def get_index_from_name(name):
-        """
-        Get an index from the name of a student.
-        :param name: name of the student from the list.
-        :return: the integer index of that student.
-        """
-        pattern = GET_INDEX_REGEX
-        return int(re.search(pattern, name).group(1)) - 1
-
     def show_network_error(self):
         self.connection_status.set(NO_CONNECTION)
 
     def notify(self):
         tkinter.messagebox.showinfo("New Student!", "A Student has registered to the queue.")
-
