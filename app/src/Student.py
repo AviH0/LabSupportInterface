@@ -23,6 +23,7 @@ class Student:
             self.sent_mail_timestamp = stu.sent_mail_timestamp
             self.time_called = stu.time_called
             self.time_arrived = stu.time_arrived
+            self.attached_file = stu.attached_file
         else:
             self.timestamp = row[0]
 
@@ -34,6 +35,8 @@ class Student:
 
             self.time_made_orange = row[3]
             self.status = None
+            self.time_called = ''
+            self.time_arrived = ''
             if len(row) > 4 and row[4]:
                 self.status = row[4]
             self.index = index
@@ -48,6 +51,9 @@ class Student:
                 self.time_called = time.strptime(row[7].split(': ')[1])
             if len(row) > 8 and row[8]:
                 self.time_arrived = time.strptime(row[8].split(': ')[1])
+            self.attached_file = ''
+            if len(row) > 10:
+                self.attached_file = row[10]
 
     def fix_hebrew(self, string: str):
         if not is_linux:

@@ -11,7 +11,7 @@ from time import strftime
 from tkinter import *
 import tkinter.messagebox
 import tkinter.simpledialog
-from typing import Union
+from typing import Union, Optional, List
 
 import gspread.exceptions
 
@@ -22,57 +22,11 @@ from app.src.Student import Student
 from app.src.emailWriter import EmailWriter
 from app.src.student_list_item import StudentListItem
 import app.src.config
+from src.current_student_widget import CurrentStudent
+from src.ui_utils import *
 
-SEND_INVITE_MENU_OPT = 'Send Invite'
 
-CLEAR_MENU_OPT = 'Clear Queue'
 
-NO_CONNECTION = "-- No Connection --"
-
-GET_INDEX_REGEX = '\((\d+)\).+'
-
-LOAD_MENU_OPT = "Provide Assistance"
-REMOVE_MENU_OPT = "Remove"
-RESET_MENU_OPT = "Reset"
-CALL_MENU_OPT = "Call Student"
-
-DATETIME_FORMAT = '%H:%M'
-
-ARRIVED_BTN_TEXT = "Student Arrived"
-NO_SHOW_BTN_TEXT = "No Show"
-FINISHED_BTN_TEXT = "Next Request"
-
-WINDOW_TITLE = "Lab Support"
-HELPING_STU_PRFX = "Receiving Assistance: "
-WAITING_STU_PRFX = "Waiting for: "
-
-TOPIC = 'Issue: '
-
-NO_SHOW_LIST_TITLE = "Missed Appointments"
-STUDENT_LIST_TITLE = "Waiting List"
-
-INDEX = '({}) '
-
-WINDOW_SIZE = '1200x330'
-HEADER2_FONT = ("Courier New", 16)
-HEADER1_FONT = ("Courier New", 18, 'bold')
-BODY_FONT = ("Courier New", 12)
-BG = 'white'
-LIST_TOPFRM_PADX = 10
-FRAME_TITLE_PADX = 5
-NO_SHOW_FRM_PADX = 10
-INFO_TXT_PADX = 10
-INFO_WRAPLENGTH = 300
-BTN_FRM_WIDTH = 400
-ACTION_BTN_PADX = 20
-INFO_FRAME_LENGTH = 350
-
-COLOR_FROM_STATUS = {'1': "yellow",
-                     '2': "orange",
-                     '3': "green"}
-
-WAITING = 1
-HELPING = 2
 
 
 class Gui:
@@ -146,8 +100,8 @@ class Gui:
         self.current_status = WAITING
 
         # Create some data holders:
-        self.current_student = None
-        self.current_list = ['INIT']
+        self.current_student: Optional[Student] = None
+        self.current_list: List[Union[str, Student]] = ['INIT']
         self.no_shows_list = []
 
         self.connection_status = StringVar()
@@ -222,12 +176,8 @@ class Gui:
         # self.current_stats_frame = Frame(self.root)
         # self.current_stats_frame.grid(row=0, column=3)
 
-        self.current_student_label = Label(self.root, font=HEADER2_FONT, anchor=W, justify=LEFT,
-                                           wraplength=INFO_WRAPLENGTH)
-        self.current_student_label.grid(row=1, column=0, sticky=NW, padx=INFO_TXT_PADX)
-
-        self.current_elapsed_time = Label(self.root, font=HEADER2_FONT, anchor=W, justify=LEFT, wraplength=INFO_WRAPLENGTH)
-        self.current_elapsed_time.grid(row=2, column=0, sticky=NW, padx=INFO_TXT_PADX)
+        self.current_student_widget = CurrentStudent(self.root)
+        self.current_student_widget.grid(row=1, column=0, sticky=NS, padx=INFO_TXT_PADX)
 
         button_frame = Frame(self.root, width=BTN_FRM_WIDTH)
 
@@ -335,8 +285,8 @@ class Gui:
         # If there were no students waiting and now there are, notify.
         if not self.current_student and len(
                 list(filter(lambda x: (x.status != '1' and x.status != '3'), new_list))) >= 1 and len(
-                list(filter(lambda x: (x.status != '1' and x.status != '3') if x != 'INIT' else True,
-                            self.current_list))) == 0:
+            list(filter(lambda x: (x.status != '1' and x.status != '3') if x != 'INIT' else True,
+                        self.current_list))) == 0:
             self.notify()
 
         self.current_list = new_list
@@ -399,38 +349,19 @@ class Gui:
 
         # Get the current status and set the buttons accordingly:
         if self.current_status == HELPING:
-            text = HELPING_STU_PRFX + '\n' + \
-                   name + '\n\n' + \
-                   TOPIC + '\n' + \
-                   topic + '\n\n'
-            self.current_student_label.configure(
-                text=text)
             self.action_button.configure(text=FINISHED_BTN_TEXT,
                                          command=self.__next_student)
             self.no_show_button.configure(state=DISABLED)
-            self.__update_timer()
 
         elif self.current_status == WAITING:
-            text = WAITING_STU_PRFX + '\n' +\
-                   name + '\n\n' + \
-                   TOPIC + '\n' + \
-                   topic + '\n\n'
-            self.current_student_label.configure(
-                text=text)
             self.no_show_button.configure(state=NORMAL)
 
             self.action_button.configure(text=ARRIVED_BTN_TEXT,
                                          command=self.__student_arrived)
-            self.__update_timer()
 
-    def __update_timer(self):
-        if not self.current_student:
-            return
-        student_last_time = (self.current_student.time_arrived if self.current_status == HELPING else self.current_student.time_called)
-        time_elapsed = time.time() - time.mktime(student_last_time)
-        text = "Time Elapsed: " + time.strftime("%H:%M:%S", time.gmtime(time_elapsed))
-        self.current_elapsed_time.configure(text=text)
-        self.root.after(1000, self.__update_timer)
+        self.current_student_widget.set_current(self.current_student, self.current_status)
+
+
 
     def __student_arrived(self):
         """
