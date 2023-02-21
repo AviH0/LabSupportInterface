@@ -2,8 +2,8 @@ import tkinter as tk
 import time
 from typing import Union
 
-from src.Student import Student
-from src.ui_utils import *
+from app.src.Student import Student
+from app.src.ui_utils import *
 
 import webbrowser
 

@@ -1,8 +1,8 @@
 import tkinter
 from tkinter import X
 
-from src.Student import Student
-from src.tooltip import CreateToolTip
+from app.src.Student import Student
+from app.src.tooltip import CreateToolTip
 
 NAME = 'Name: '
 TIMESTAMP = 'Added:'

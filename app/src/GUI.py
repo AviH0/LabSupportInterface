@@ -22,8 +22,8 @@ from app.src.Student import Student
 from app.src.emailWriter import EmailWriter
 from app.src.student_list_item import StudentListItem
 import app.src.config
-from src.current_student_widget import CurrentStudent
-from src.ui_utils import *
+from app.src.current_student_widget import CurrentStudent
+from app.src.ui_utils import *
 
 
 
