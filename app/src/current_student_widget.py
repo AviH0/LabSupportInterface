@@ -36,6 +36,7 @@ class CurrentStudent(tk.Frame):
     def set_current(self, student: Student, status):
         self.status = status
         status_text = ''
+        self.attached_file_link.configure(text='')
         if student:
             if self.status == HELPING:
                 status_text = HELPING_STU_PRFX + '\n' + \
@@ -49,6 +50,7 @@ class CurrentStudent(tk.Frame):
                               student.topic
             if student.attached_file:
                 self.attached_file_link.configure(text='Click To Open Attached File')
+
 
         # if status_text:
         self.current_student_label.configure(
