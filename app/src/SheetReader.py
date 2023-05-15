@@ -30,6 +30,7 @@ def authenticate(func):
         try:
             return func(*args, **kwargs)
         except gspread.exceptions.APIError:
+            time.sleep(3)
             args[0].reauth()
             return inner(*args, **kwargs)
         except requests.exceptions.ConnectionError:

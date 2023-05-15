@@ -218,7 +218,7 @@ class Gui:
     async def get_info_loop(self):
         while True:
             await self.__get_info()
-            await asyncio.sleep(1)
+            await asyncio.sleep(5)
 
     def __select_sheet(self):
         # Create a new temporary "parent"
